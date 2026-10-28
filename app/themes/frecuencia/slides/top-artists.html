@@ -1,0 +1,2 @@
+<p class="lead">{{{s.artists_lead}}}</p>
+<ol class="artists">{{#each top_artists limit=5}}<li style="--n:{{@n}}" data-v="{{plays}}"><span class="rk">{{rank}}</span><span class="nm" data-fit="1">{{name}}</span><span class="meta"><i class="bar"></i><span class="pl">{{plays | num}} {{{s.artists_unit}}}</span></span></li>{{/each}}</ol>

@@ -1,0 +1,54 @@
+{
+  "name": "Remix (React)",
+  "author": "Navidrome Wrapped",
+  "version": "1.0.0",
+  "description": "React + motion: fondos fluidos, anillos concéntricos, texto que sube por palabras, carátulas que saltan y números que entran de lado. Inspirado en los resúmenes anuales de Spotify y Apple Music.",
+  "engine": "react",
+  "entry": "dist/theme.js",
+  "wide": true,
+  "tokens": {
+    "--bg": "#111",
+    "--fg": "#f3eee2",
+    "--accent": "#ff5a1f"
+  },
+  "palette": [
+    "#111111"
+  ],
+  "css": [
+    "theme.css"
+  ],
+  "audio": {
+    "enabled": true,
+    "fade": 0.8
+  },
+  "slides": [
+    {
+      "type": "intro",
+      "duration": 5200
+    },
+    "minutes",
+    {
+      "type": "top-artists",
+      "duration": 8500
+    },
+    {
+      "type": "race",
+      "duration": 16500
+    },
+    "top-tracks",
+    "number-one",
+    "discoveries",
+    "night",
+    "hour",
+    "months",
+    "age",
+    {
+      "type": "outro",
+      "duration": 6500
+    }
+  ],
+  "strings": {
+    "splash_title": "Tu {year}<br>en música",
+    "splash_button": "Dale al play"
+  }
+}

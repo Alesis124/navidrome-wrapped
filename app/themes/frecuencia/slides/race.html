@@ -1,0 +1,5 @@
+<p class="lead">{{{s.race_lead}}}</p>
+<div class="hero mo" aria-hidden="true">&nbsp;</div>
+<div class="tl" aria-hidden="true"></div>
+<div class="race" data-max="{{x.max}}" data-months="{{x.months}}" aria-hidden="true">{{#each x.artists}}<div class="lane" data-cum="{{cumulative}}" data-clip="{{clip}}" style="--r:{{@index}};--i0:{{@index}}"><span class="av" style="background-image:url({{cover}})"></span><b class="nm">{{name}}</b><span class="ct">{{plays | num}}</span><span class="trk"><i class="fill" style="--ff:{{frac.11}}"></i></span></div>{{/each}}</div>
+<p class="note win on">{{{s.race_end}}}</p>

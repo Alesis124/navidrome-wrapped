@@ -1,0 +1,56 @@
+name: navidrome-wrapped
+
+services:
+  wrapped:
+    build: .
+    image: navidrome-wrapped:latest
+    container_name: navidrome-wrapped
+    restart: unless-stopped
+    user: "${PUID:-1000}:${PGID:-1000}"
+    environment:
+      TZ: ${TZ:-Europe/Madrid}
+      DB_PATH: /data/navidrome.db
+      MUSIC_DIR: /music
+      CACHE_DIR: /cache
+      NAVIDROME_USER: ${NAVIDROME_USER:-}
+      WRAPPED_YEAR: ${WRAPPED_YEAR:-}
+      CLIP_SECONDS: ${CLIP_SECONDS:-30}
+      SNAPSHOT_TTL: ${SNAPSHOT_TTL:-60}
+      THEMES_DIR: /themes
+      WRAPPED_THEME: ${WRAPPED_THEME:-}   # vacío = tema con el nombre del año, o frecuencia
+      DB_ACCESS: ${DB_ACCESS:-auto}   # auto | direct | snapshot
+      ADMIN_KEY: ${ADMIN_KEY:-}      # clave para importar temas .zip desde la web (vacío = desactivado)
+    volumes:
+      # Carpeta de datos de Navidrome (la que contiene navidrome.db), SOLO LECTURA.
+      # Se monta la carpeta y no el fichero suelto porque SQLite usa también
+      # navidrome.db-wal y navidrome.db-shm, que viven al lado.
+      - ${NAVIDROME_DATA_DIR:?Define NAVIDROME_DATA_DIR en .env}:/data:ro
+      # Misma música que Navidrome, solo lectura (para cortar los clips).
+      - ${MUSIC_DIR_HOST:?Define MUSIC_DIR_HOST en .env}:/music:ro
+      # Tus temas (themes/2027/theme.json…). Escribible: la web instala aquí los .zip importados
+      # (tiene que ser de PUID:PGID; ./deploy.sh lo ajusta). También: scripts/theme.py install.
+      - ./themes:/themes
+      # Clips, carátulas y snapshot de la BD generados por la app.
+      - wrapped_cache:/cache
+    ports:
+      # Quítalo si lo sirves solo a través de tu proxy inverso por la red de Navidrome.
+      - "${WRAPPED_PORT:-8100}:8000"
+    networks:
+      - navidrome
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  wrapped_cache:
+
+networks:
+  navidrome:
+    # Red que ya existe (la de tu contenedor de Navidrome). Comprueba el nombre con:
+    #   docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'
+    external: true
+    name: ${NAVIDROME_NETWORK:-navidrome_default}

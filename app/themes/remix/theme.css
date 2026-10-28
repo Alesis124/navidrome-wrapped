@@ -1,0 +1,119 @@
+/* Remix (React + motion). Todo en unidades de contenedor: vale igual en vertical y apaisado. */
+#react-root { container-type: size; font-family: "Helvetica Neue", Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+.rx { position: absolute; inset: 0; overflow: hidden; background: var(--bg); color: var(--fg); display: flex; flex-direction: column; justify-content: center; }
+.rx-in { position: relative; z-index: 2; width: min(100%, 150cqh); margin: 0 auto; padding: 9cqmin 8cqmin; display: flex; flex-direction: column; gap: 3cqmin; }
+.rx-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .14em; margin-right: .26em; }
+.rx-w > span { display: inline-block; will-change: transform; }
+.rx-k  { font-size: 3.6cqmin; font-weight: 600; opacity: .85; }
+.rx-h  { font-size: 11cqmin; line-height: .95; font-weight: 800; letter-spacing: -.045em; margin: 0; }
+.rx-h2 { font-size: 6.4cqmin; line-height: 1.02; font-weight: 800; letter-spacing: -.03em; margin: 0; text-align: center; }
+.rx-p  { font-size: 4cqmin; line-height: 1.3; margin: 0; opacity: .9; }
+.rx-num { font-size: 24cqmin; line-height: .9; font-weight: 800; letter-spacing: -.06em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Fondos */
+.rx-mesh { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.rx-mesh i { position: absolute; width: 120cqmax; height: 120cqmax; border-radius: 50%; }
+.rx-mesh i:nth-child(1) { left: -40%; top: -20%; } .rx-mesh i:nth-child(2) { right: -50%; top: 10%; }
+.rx-mesh i:nth-child(3) { left: -30%; bottom: -50%; } .rx-mesh i:nth-child(4) { right: -40%; bottom: -40%; }
+.rx-cv { position: absolute; inset: 0; z-index: 0; background: center / cover no-repeat; }
+.rx-cv::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.7)); }
+
+/* Carátulas que saltan */
+.rx-pop { position: absolute; z-index: 1; aspect-ratio: 1; object-fit: cover; border-radius: 1.6cqmin; box-shadow: 0 1.5cqmin 5cqmin rgba(0,0,0,.35); }
+
+/* Intro */
+.rx-intro .rx-in { align-items: flex-start; justify-content: flex-end; height: 100%; padding-bottom: 14cqmin; }
+.rx-intro .rx-h { font-size: 17cqmin; color: #fff; }
+.rx-spark { position: absolute; z-index: 2; width: 18cqmin; height: 18cqmin; fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; }
+
+/* Anillos (artistas) */
+.rx-art { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; gap: 4cqmin; height: 100%; padding: 12cqmin 0 6cqmin; }
+.rx-art .rx-h2 { padding: 0 8cqmin; }
+.rx-band { position: relative; width: 100%; height: 54cqmin; overflow: hidden; flex: none; }
+.rx-rings { position: absolute; inset: 0; width: 100%; height: 100%; }
+.rx-face { position: absolute; left: 50%; top: 50%; width: 36cqmin; aspect-ratio: 1; margin: -18cqmin 0 0 -18cqmin; border-radius: 50%; overflow: hidden; background: #333; border: 1cqmin solid var(--bg); }
+.rx-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rx-name { text-align: center; display: grid; gap: .8cqmin; min-height: 11cqmin; }
+.rx-name b { font-size: 5.6cqmin; font-weight: 800; letter-spacing: -.02em; }
+.rx-name small { font-size: 3.2cqmin; opacity: .7; }
+
+/* Canciones */
+.rx-row { display: grid; grid-template-columns: 5cqmin 15cqmin 1fr auto; gap: 3cqmin; align-items: center; }
+.rx-row .r { font-size: 7cqmin; font-weight: 800; letter-spacing: -.04em; color: var(--ac); }
+.rx-row img { width: 15cqmin; aspect-ratio: 1; border-radius: 1.2cqmin; object-fit: cover; }
+.rx-row b { display: block; font-size: 4.4cqmin; line-height: 1.1; letter-spacing: -.02em; }
+.rx-row small { display: block; font-size: 3.1cqmin; opacity: .7; margin-top: .5cqmin; }
+.rx-row .n { font-size: 3.4cqmin; font-weight: 700; }
+
+/* Número uno */
+.rx-one .rx-in { align-items: center; text-align: center; }
+.rx-big-cover { width: 54cqmin; aspect-ratio: 1; object-fit: cover; border-radius: 2cqmin; box-shadow: 0 3cqmin 10cqmin rgba(0,0,0,.55); }
+
+/* Reloj y barras */
+.rx-clock { width: 62cqmin; max-width: 100%; align-self: center; }
+.rx-clock line { stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; opacity: .35; }
+.rx-clock line.pk { stroke: var(--ac); opacity: 1; stroke-width: 2.4; }
+.rx-cols { display: flex; align-items: flex-end; gap: 1.2cqmin; height: 34cqmin; }
+.rx-cols > div { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 1cqmin; font-size: 2.8cqmin; font-weight: 700; }
+.rx-cols i { display: block; width: 100%; border-radius: 1.4cqmin 1.4cqmin 0 0; background: currentColor; opacity: .3; transform-origin: bottom; min-height: .8cqmin; }
+.rx-cols .pk i { background: var(--ac); opacity: 1; }
+.rx-chips { display: flex; gap: 3cqmin; flex-wrap: wrap; }
+.rx-chip { padding: 2cqmin 3cqmin; border-radius: 2cqmin; background: rgba(255,255,255,.2); font-size: 3.2cqmin; }
+.rx-chip b { display: block; font-size: 6.4cqmin; letter-spacing: -.03em; }
+
+/* Colores por diapositiva */
+.rx-minutes     { --bg: #ff5a1f; --fg: #fff; --ac: #fff; }
+.rx-top-artists { --bg: #151515; --fg: #f3eee2; --ac: #f3eee2; }
+.rx-top-tracks  { --bg: #f3eee2; --fg: #151515; --ac: #ff5a1f; }
+.rx-number-one  { --bg: #151515; --fg: #fff; }
+.rx-discoveries { --bg: #5b2bff; --fg: #fff; --ac: #fff; }
+.rx-night       { --bg: #0a1030; --fg: #eaf0ff; --ac: #ffd45e; }
+.rx-hour        { --bg: #d8ff3d; --fg: #121212; --ac: #121212; }
+.rx-age         { --bg: #7be0a8; --fg: #0f1f17; --ac: #fff; }
+.rx-months      { --bg: #ff8fc2; --fg: #14101f; --ac: #fff; }
+.rx-outro       { --bg: #151515; --fg: #f3eee2; }
+.rx-hour .rx-clock line { opacity: .25; } .rx-hour .rx-clock line.pk { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .rx-mesh i { animation: none; } }
+
+/* Apaisado: menos alto disponible, así que todo se compacta */
+@container (min-aspect-ratio: 5/4) {
+  .rx-top-tracks .rx-h { font-size: 7.5cqmin; }
+  .rx-row { grid-template-columns: 5cqmin 11cqmin 1fr auto; gap: 2cqmin; }
+  .rx-row img { width: 11cqmin; }
+  .rx-top-tracks .rx-in { gap: 2.2cqmin; }
+  .rx-band { height: 46cqmin; }
+  .rx-num { font-size: 22cqmin; }
+  .rx-big-cover { width: 44cqmin; }
+  .rx-one .rx-in { gap: 2cqmin; }
+  .rx-clock { width: 52cqmin; }
+}
+
+/* Carrera de artistas (vertical) */
+.rx-race { position: relative; z-index: 2; width: min(100%, 150cqh); margin: 0 auto; height: 100%; padding: 10cqmin 5cqmin 6cqmin; display: flex; flex-direction: column; gap: 2cqmin; }
+.rx-field { position: relative; flex: 1; min-height: 0; overflow: hidden; border-radius: 3cqmin; }
+.rx-speed { position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(to bottom, rgba(243,238,226,.16) 0 .5cqmin, transparent .5cqmin 9cqmin),
+    repeating-linear-gradient(to bottom, rgba(243,238,226,.07) 0 2.2cqmin, transparent 2.2cqmin 4.5cqmin);
+  background-size: 100% 18cqmin, 14% 100%; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent); }
+.rx-col { position: absolute; top: 0; bottom: 0; transform: translateX(-50%); border-left: .3cqmin dashed rgba(243,238,226,.1); }
+.rx-racer { position: absolute; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; will-change: transform; text-align: center; }
+.rx-runner { position: relative; width: var(--av); height: var(--av); border-radius: 50%; border: .9cqmin solid var(--lc); background: #333; }
+.rx-runner img, .rx-runner span { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.rx-racer b { margin-top: .8cqmin; font-size: 2.6cqmin; line-height: 1.1; max-width: 96%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rx-racer span { font-size: 2.4cqmin; opacity: .75; font-variant-numeric: tabular-nums; }
+.rx-runner.win { box-shadow: 0 0 0 1.2cqmin rgba(255,212,94,.5); }
+.rx-crown { position: absolute; right: -1.2cqmin; top: -3cqmin; font-style: normal; font-size: 5cqmin; color: #ffd45e; }
+.rx-race-foot { min-height: 18cqmin; }
+.rx-h2.left { text-align: left; }
+@container (min-aspect-ratio: 5/4) {
+  .rx-race { padding: 8cqmin 6cqmin 4cqmin; }
+  .rx-race-foot { min-height: 12cqmin; }
+  .rx-racer b { font-size: 2.2cqmin; } .rx-racer span { font-size: 2cqmin; }
+}
+
+.rx-agenum { font-size: 34cqmin; font-weight: 900; line-height: .9; letter-spacing: -.03em; }
+.rx-decs { display: grid; gap: 1.2cqmin; margin: 3cqmin 0; }
+.rx-decs > div { display: grid; grid-template-columns: 9cqmin 1fr; align-items: center; gap: 2cqmin; font-size: 2.8cqmin; font-weight: 700; }
+.rx-decs i { display: block; height: 3cqmin; min-width: .8cqmin; background: currentColor; opacity: .3; border-radius: 1cqmin; transform-origin: 0 50%; }
+.rx-decs .pk i { background: var(--ac); opacity: 1; }
+.rx-fine { font-size: 2.4cqmin; margin: 0; }

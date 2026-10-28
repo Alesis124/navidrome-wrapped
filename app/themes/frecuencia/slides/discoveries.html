@@ -1,0 +1,5 @@
+<p class="lead">{{{s.discoveries_lead}}}</p>
+<div class="hero" data-count="{{discoveries.new_tracks}}" data-fit="1">0</div>
+<p class="unit">{{{s.discoveries_unit}}}</p>
+{{#if discoveries.new_artists}}<p class="note">{{{s.discoveries_artists}}}</p>{{/if}}
+<div class="topnew"><p class="fine top-label">{{{s.discoveries_top}}}</p><div class="deck">{{#each discoveries.top_new_tracks limit=3}}<figure style="--n:{{@index}}"><span class="cv" style="background-image:url({{cover}})"></span><figcaption><strong>{{title}}</strong><small>{{artist}}</small></figcaption></figure>{{/each}}</div></div>

@@ -1,0 +1,17 @@
+/* Font Awesome Free 6.5.2 (solid), solo los iconos que usa el reproductor.
+   Iconos CC BY 4.0, fuente SIL OFL 1.1, código MIT: ver LICENSE-fontawesome.txt */
+@font-face { font-family: "FA Solid"; font-style: normal; font-weight: 900; font-display: block;
+  src: url("fa-solid-900.woff2") format("woff2"); }
+.fa { display: inline-block; font: 900 1em/1 "FA Solid"; font-style: normal; text-rendering: auto;
+  -webkit-font-smoothing: antialiased; }
+.fa-expand::before { content: "\f065"; }
+.fa-compress::before { content: "\f066"; }
+.fa-mobile-screen::before { content: "\f3cf"; }
+.fa-desktop::before { content: "\f390"; }
+.fa-volume-high::before { content: "\f028"; }
+.fa-volume-low::before { content: "\f027"; }
+.fa-volume-xmark::before { content: "\f6a9"; }
+.fa-download::before { content: "\f019"; }
+.fa-house::before { content: "\f015"; }
+.fa-images::before { content: "\f302"; }
+.fa-face-frown::before { content: "\f119"; }

@@ -1,0 +1,16 @@
+{
+  "name": "navidrome-wrapped-theme-kit",
+  "private": true,
+  "type": "module",
+  "description": "Herramientas para temas React + motion de Navidrome Wrapped",
+  "scripts": {
+    "vendor": "node build-vendor.mjs",
+    "build": "node build-theme.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "motion": "^12.0.0"
+  }
+}

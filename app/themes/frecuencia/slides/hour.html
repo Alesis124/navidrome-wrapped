@@ -1,0 +1,3 @@
+<p class="lead">{{{s.hour_lead}}}</p>
+<div class="dial24" data-peak="{{x.peak}}"><span class="sweep"></span>{{#each x.hist}}<i data-h="{{h}}" style="--k:{{@index}};--p:{{pct}}"><b></b></i>{{/each}}<span class="hl" style="--a:0deg">0 h</span><span class="hl" style="--a:90deg">6 h</span><span class="hl" style="--a:180deg">12 h</span><span class="hl" style="--a:270deg">18 h</span><div class="mid"><strong class="hero">{{x.peak}}:00</strong></div></div>
+<p class="note">{{{s.hour_detail}}}</p>

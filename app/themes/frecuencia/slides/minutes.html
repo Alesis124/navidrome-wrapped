@@ -1,0 +1,7 @@
+<p class="lead">{{{s.minutes_lead}}}</p>
+<div class="hero" data-count="{{totals.minutes}}" data-fit="1">0</div>
+<p class="unit">{{{s.minutes_unit}}}</p>
+<div class="meter" data-min="{{totals.minutes}}" data-year="{{year}}" aria-hidden="true"><i></i></div>
+<p class="note">{{{s.minutes_note}}}</p>
+<p class="fine">{{{s.minutes_detail}}}</p>
+<div class="mosaic" aria-hidden="true">{{#each top_tracks limit=9}}<i style="--n:{{@index}};background-image:url({{cover}})"></i>{{/each}}</div>

@@ -1,0 +1,2 @@
+<p class="lead">{{{s.tracks_lead}}}</p>
+<ol class="tracks">{{#each top_tracks limit=5}}<li style="--n:{{@n}}"><span class="rk">{{rank}}</span><span class="cv" style="background-image:url({{cover}})"></span><span class="tt"><strong>{{title}}</strong><small>{{artist}}</small></span><span class="pl">{{plays | num}}<small>{{{s.tracks_unit}}}</small></span></li>{{/each}}</ol>

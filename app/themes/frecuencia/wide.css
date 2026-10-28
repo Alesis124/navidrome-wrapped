@@ -1,0 +1,172 @@
+/* ==========================================================================
+   Frecuencia · vista ancha (ordenador). La tarjeta ocupa toda la ventana.
+   Mismo recurso que Aurora y Classic: el fotograma pasa a ser apaisado de 100 × 56,25 u
+   (1 u = 1 % del ancho, o 1,7778 % del alto si la ventana es más cuadrada). Si la ventana
+   sobra por algún lado, el fondo se extiende y el contenido queda centrado (--pad, --padv).
+   Texto a la izquierda; el «objeto» de cada diapositiva (disco, reloj, listas…) a la derecha.
+   (Se escribe con «Nu» y se compila a calc(var(--u) * N): ver build.py)
+   ========================================================================== */
+
+html[data-view="wide"] {
+  --u: min(1vw, 1.7778dvh);
+  --pad: max(calc(var(--u) * 6), calc((100vw - calc(var(--u) * 100)) / 2 + calc(var(--u) * 6)));      /* margen lateral */
+  --padv: max(0px, calc((100dvh - calc(var(--u) * 56.25)) / 2));      /* margen vertical sobrante */
+  --col: calc(var(--u) * 41);                                         /* ancho de la columna derecha */
+}
+html[data-view="wide"] #ambient { display: none; }
+html[data-view="wide"] #stage { border-radius: 0; box-shadow: none; }
+
+/* Marco */
+html[data-view="wide"] #progress { top: calc(var(--padv) + calc(var(--u) * 3)); left: var(--pad); right: var(--pad); gap: calc(var(--u) * .9); }
+html[data-view="wide"] #progress i { height: max(2px, calc(var(--u) * .6)); }
+html[data-view="wide"] .hud { top: calc(var(--padv) + calc(var(--u) * 5.4)); right: var(--pad); }
+html[data-view="wide"] #fx-spec { height: calc(var(--u) * 7); }
+
+/* Tarjeta: columna de texto a la izquierda */
+html[data-view="wide"] .card { justify-content: center; align-items: stretch; gap: calc(var(--u) * 1.5);
+  padding: calc(var(--padv) + calc(var(--u) * 10)) calc(var(--pad) + var(--col) + calc(var(--u) * 5)) calc(var(--padv) + calc(var(--u) * 9)) var(--pad); }
+
+/* Tipografía a escala del fotograma apaisado */
+html[data-view="wide"] .lead { font-size: calc(var(--u) * 2.5); max-width: calc(var(--u) * 40); }
+html[data-view="wide"] .unit { font-size: calc(var(--u) * 5.4); }
+html[data-view="wide"] .note { font-size: calc(var(--u) * 2.2); max-width: calc(var(--u) * 40); }
+html[data-view="wide"] .fine { font-size: calc(var(--u) * 1.6); max-width: calc(var(--u) * 40); }
+html[data-view="wide"] .line { font-size: calc(var(--u) * 3.2); }
+html[data-view="wide"] .hero { --fs: calc(var(--u) * 20); }
+html[data-view="wide"] .mega { --fs: calc(var(--u) * 30); }
+html[data-view="wide"] .title { --fs: calc(var(--u) * 9); }
+/* En las listas y el reloj, la frase de arriba pasa a ser el titular de la columna izquierda */
+html[data-view="wide"] .swiper-slide:is([data-type="top-artists"], [data-type="top-tracks"], [data-type="hour"]) .lead {
+  font-family: var(--display); font-weight: 900; font-size: calc(var(--u) * 9.5); line-height: .9; opacity: 1; max-width: calc(var(--u) * 36); }
+
+/* Objetos de la derecha: centrados en vertical */
+html[data-view="wide"] .swiper-slide .card > :is(.artists, .tracks, .recap, .mosaic, .topnew, .race, .decs) {
+  position: absolute; z-index: 1; top: calc(var(--padv) + calc(var(--u) * 4)); bottom: var(--padv); margin: auto 0; height: fit-content;
+  right: var(--pad); left: auto; width: var(--col); }
+
+/* ---- 1 · Intro: sintonizador a todo lo ancho ---- */
+html[data-view="wide"] .swiper-slide:is([data-type="intro"], [data-type="collage"]) .card { padding-right: var(--pad); }
+html[data-view="wide"] .orb { width: calc(var(--u) * 70); right: calc(var(--pad) - calc(var(--u) * 14)); top: 50%; margin-top: calc(var(--u) * -35); }
+html[data-view="wide"] .dial { height: calc(var(--u) * 4); margin: calc(var(--u) * 1) 0 0;
+  background:
+    linear-gradient(90deg, rgba(246,242,234,.5) 0 calc(var(--u) * .2), transparent calc(var(--u) * .2)) 0 100% / calc(var(--u) * 1.6) calc(var(--u) * 1.5) repeat-x,
+    linear-gradient(90deg, rgba(246,242,234,.9) 0 calc(var(--u) * .3), transparent calc(var(--u) * .3)) 0 100% / calc(var(--u) * 8) calc(var(--u) * 3.2) repeat-x; }
+html[data-view="wide"] .needle { width: calc(var(--u) * .45); top: calc(var(--u) * -1); bottom: calc(var(--u) * -.5); }
+html[data-view="wide"] .swiper-slide[data-type="intro"] .mega { --fs: calc(var(--u) * 31); margin-top: 0; }
+
+/* ---- 2 · Minutos: mosaico de portadas ---- */
+html[data-view="wide"] .meter { height: calc(var(--u) * 1.8); margin-top: calc(var(--u) * 1.4); background-size: calc(var(--u) * .55) 100%; }
+html[data-view="wide"] .meter i { background-size: calc(var(--u) * .55) 100%; min-width: calc(var(--u) * .3);
+  background-image: linear-gradient(90deg, var(--glow) 0 calc(var(--u) * .25), transparent calc(var(--u) * .25)); }
+html[data-view="wide"] .meter { background-image: linear-gradient(90deg, rgba(246,242,234,.26) 0 calc(var(--u) * .25), transparent calc(var(--u) * .25)); }
+html[data-view="wide"] .mosaic { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(var(--u) * 1.6); }
+html[data-view="wide"] .mosaic i { aspect-ratio: 1; border-radius: calc(var(--u) * .7); background: var(--k-mid, #3a2358) center / cover;
+  box-shadow: 0 calc(var(--u) * .8) calc(var(--u) * 2) rgba(0,0,0,.45); }
+html[data-view="wide"] .mosaic i:nth-child(3n+2) { transform: translateY(calc(var(--u) * 1.6)); }
+html[data-view="wide"] .swiper-slide-active .mosaic i { animation: pop .9s var(--ease-spring) backwards; animation-delay: calc(.5s + var(--n) * 80ms); }
+
+/* ---- 3 · Artistas ---- */
+html[data-view="wide"] .artists { gap: calc(var(--u) * 1.6); }
+html[data-view="wide"] .artists li { grid-template-columns: calc(var(--u) * 3.4) minmax(0, 1fr); column-gap: calc(var(--u) * 1); }
+html[data-view="wide"] .artists .rk { font-size: calc(var(--u) * 2.4); padding-bottom: calc(var(--u) * .5); }
+html[data-view="wide"] .artists li:nth-child(1) .rk { font-size: calc(var(--u) * 3.6); padding-bottom: calc(var(--u) * .9); }
+html[data-view="wide"] .artists li:nth-child(1) .nm { --fs: calc(var(--u) * 6.4); }
+html[data-view="wide"] .artists li:nth-child(2) .nm { --fs: calc(var(--u) * 4.6); }
+html[data-view="wide"] .artists li:nth-child(3) .nm { --fs: calc(var(--u) * 3.8); }
+html[data-view="wide"] .artists li:nth-child(4) .nm { --fs: calc(var(--u) * 3.2); }
+html[data-view="wide"] .artists li:nth-child(5) .nm { --fs: calc(var(--u) * 2.9); }
+html[data-view="wide"] .artists .meta { gap: calc(var(--u) * 1.2); margin-top: calc(var(--u) * .5); }
+html[data-view="wide"] .artists .bar { height: calc(var(--u) * .45); width: calc(var(--p, 20) * calc(var(--u) * .28)); }
+html[data-view="wide"] .artists .pl { font-size: calc(var(--u) * 1.5); }
+
+/* ---- 4 · Canciones ---- */
+html[data-view="wide"] .tracks li { grid-template-columns: calc(var(--u) * 3) calc(var(--u) * 5.2) minmax(0, 1fr) auto; column-gap: calc(var(--u) * 1.4); padding: calc(var(--u) * .9) 0; border-top-width: max(1px, calc(var(--u) * .12)); }
+html[data-view="wide"] .tracks li:first-child { grid-template-columns: calc(var(--u) * 3) calc(var(--u) * 7.4) minmax(0, 1fr) auto; padding-top: calc(var(--u) * 1.1); }
+html[data-view="wide"] .tracks .rk { font-size: calc(var(--u) * 3); }
+html[data-view="wide"] .tracks .cv { border-radius: calc(var(--u) * .5); box-shadow: 0 calc(var(--u) * .6) calc(var(--u) * 1.6) rgba(0,0,0,.45); }
+html[data-view="wide"] .tracks .tt strong { font-size: calc(var(--u) * 2); }
+html[data-view="wide"] .tracks li:first-child .tt strong { font-size: calc(var(--u) * 2.8); }
+html[data-view="wide"] .tracks .tt small { font-size: calc(var(--u) * 1.45); }
+html[data-view="wide"] .tracks .pl { font-size: calc(var(--u) * 3.2); }
+html[data-view="wide"] .tracks .pl small { font-size: calc(var(--u) * 1.15); }
+
+/* ---- 5 · Número uno: la portada con su disco a la derecha ---- */
+html[data-view="wide"] .sleeve { position: absolute; width: calc(var(--u) * 30); right: calc(var(--pad) + calc(var(--u) * 9)); top: 50%; margin: calc(var(--u) * -15) 0 0; }
+html[data-view="wide"] .art { border-radius: calc(var(--u) * .5); box-shadow: 0 calc(var(--u) * 2.4) calc(var(--u) * 6) rgba(0,0,0,.6), 0 0 calc(calc(var(--u) * 2) + var(--beat) * calc(var(--u) * 6)) var(--glow-soft, transparent); }
+html[data-view="wide"] .record { top: calc(var(--u) * 1.6); left: calc(var(--u) * 12.5); width: calc(var(--u) * 28); }
+html[data-view="wide"] .disc { box-shadow: 0 calc(var(--u) * 1) calc(var(--u) * 3) rgba(0,0,0,.5); background-image:
+  radial-gradient(circle, transparent 0 21%, rgba(255,255,255,.06) 21.4%, transparent 22%),
+  repeating-radial-gradient(circle, #0b0b10 0 calc(var(--u) * .18), #1a1a22 calc(var(--u) * .18) calc(var(--u) * .36)); }
+html[data-view="wide"] .by { font-size: calc(var(--u) * 2.8); }
+html[data-view="wide"] .count { font-size: calc(var(--u) * 2.3); }
+
+/* ---- 6 · Descubrimientos ---- */
+html[data-view="wide"] .swiper-slide[data-type="discoveries"] .hero { --fs: calc(var(--u) * 18); }
+html[data-view="wide"] .topnew { gap: calc(var(--u) * 1.6); margin-top: 0; }
+html[data-view="wide"] .deck { gap: calc(var(--u) * 2); }
+html[data-view="wide"] .deck .cv { border-radius: calc(var(--u) * .6); box-shadow: 0 calc(var(--u) * 1.2) calc(var(--u) * 3) rgba(0,0,0,.5); }
+html[data-view="wide"] .deck figcaption { gap: calc(var(--u) * .3); }
+html[data-view="wide"] .deck strong { font-size: calc(var(--u) * 1.7); }
+html[data-view="wide"] .deck small { font-size: calc(var(--u) * 1.3); }
+
+/* ---- 7 · Hora: reloj radial a la derecha ---- */
+html[data-view="wide"] .dial24 { --R: calc(var(--u) * 11.5); position: absolute; width: calc(var(--u) * 41); right: var(--pad); top: 50%; margin: calc(var(--u) * -20.5) 0 0; }
+html[data-view="wide"] .dial24 > i > b { left: calc(var(--u) * -.6); width: calc(var(--u) * 1.2); height: calc(calc(var(--u) * 1.6) + var(--p) * calc(var(--u) * .065)); border-radius: calc(var(--u) * .6); }
+html[data-view="wide"] .dial24 .mid .hero { --fs: calc(var(--u) * 6.4); font-size: calc(var(--u) * 6.4); }
+html[data-view="wide"] .dial24 .hl { font-size: calc(var(--u) * 1.25); width: calc(var(--u) * 4); margin: calc(var(--u) * -.7) 0 0 calc(var(--u) * -2);
+  transform: rotate(var(--a)) translateY(calc(-1 * (var(--R) - calc(var(--u) * 2.2)))) rotate(calc(-1 * var(--a))); }
+
+/* ---- 8 · Madrugada ---- */
+html[data-view="wide"] .swiper-slide[data-type="night"] .hero { --fs: calc(var(--u) * 20); }
+html[data-view="wide"] .moon { right: calc(var(--pad) + calc(var(--u) * 6)); top: calc(var(--padv) + calc(var(--u) * 12)); --m: calc(var(--u) * 26); }
+
+/* ---- 9 · Bucle ---- */
+html[data-view="wide"] .mq-wrap { inset: calc(var(--padv) + calc(var(--u) * 6)) 0 calc(var(--padv) + calc(var(--u) * 6)); }
+html[data-view="wide"] .mq { font-size: calc(var(--u) * 9.5); -webkit-text-stroke-width: max(1px, calc(var(--u) * .12)); }
+
+/* ---- 10 · Disco rayado: a todo lo ancho ---- */
+html[data-view="wide"] .swiper-slide[data-type="repeat"] .card { padding-right: var(--pad); }
+html[data-view="wide"] .glitch { --fs: calc(var(--u) * 22); }
+html[data-view="wide"] .tally { gap: calc(var(--u) * 1.2) calc(var(--u) * 2.2); padding: calc(var(--u) * .5) 0; }
+html[data-view="wide"] .tally .grp { height: calc(var(--u) * 5.4); gap: calc(var(--u) * .8); }
+html[data-view="wide"] .tally .grp i { width: calc(var(--u) * .6); }
+html[data-view="wide"] .tally .grp u { height: calc(var(--u) * .6); left: calc(var(--u) * -.6); right: calc(var(--u) * -.6); }
+
+/* ---- La carrera ---- */
+html[data-view="wide"] .mo { --fs: calc(var(--u) * 11); }
+html[data-view="wide"] .tl { height: calc(var(--u) * 2); gap: calc(var(--u) * .6); }
+html[data-view="wide"] .tl i { height: calc(var(--u) * .7); }
+html[data-view="wide"] .tl i.on { height: calc(var(--u) * 2); }
+html[data-view="wide"] .swiper-slide .card > .race { --rowh: calc(var(--u) * 7.9); height: calc(var(--rowh) * var(--n, 5)); }
+html[data-view="wide"] .lane { height: calc(var(--rowh) - calc(var(--u) * 1.2)); grid-template-columns: calc(var(--u) * 5.8) minmax(0, 1fr) auto; column-gap: calc(var(--u) * 1.4); row-gap: calc(var(--u) * .4); }
+html[data-view="wide"] .lane .av { border-radius: calc(var(--u) * .6); }
+html[data-view="wide"] .lane .nm { font-size: calc(var(--u) * 1.9); }
+html[data-view="wide"] .lane .ct { font-size: calc(var(--u) * 2.6); }
+html[data-view="wide"] .lane .trk { height: calc(var(--u) * 1.5); border-radius: calc(var(--u) * .75); }
+html[data-view="wide"] .win { min-height: calc(var(--u) * 7); }
+
+/* ---- La edad musical ---- */
+html[data-view="wide"] .swiper-slide .card > .decs { height: calc(var(--u) * 36); gap: calc(var(--u) * .8); }
+html[data-view="wide"] .dec { gap: calc(var(--u) * .7); }
+html[data-view="wide"] .dec i { height: calc(calc(var(--u) * .7) + var(--p) * calc(var(--u) * .28)); border-radius: calc(var(--u) * .5) calc(var(--u) * .5) calc(var(--u) * .2) calc(var(--u) * .2); }
+html[data-view="wide"] .dec span { font-size: calc(var(--u) * 1.35); }
+
+/* ---- 11 · Final ---- */
+html[data-view="wide"] .mega[data-fit="2"] { --fs: calc(var(--u) * 17); }
+html[data-view="wide"] .recap div { padding: calc(var(--u) * 1.3) 0; gap: calc(var(--u) * .3); }
+html[data-view="wide"] .recap dt { font-size: calc(var(--u) * 1.5); }
+html[data-view="wide"] .recap dd { font-size: calc(var(--u) * 3.6); }
+
+/* ---- 12 · Collage: ocupa todo el ancho bajo el titular ---- */
+html[data-view="wide"] .swiper-slide[data-type="collage"] .card { justify-content: flex-start; gap: calc(var(--u) * .8);
+  padding: calc(var(--padv) + calc(var(--u) * 8.5)) var(--pad) calc(var(--padv) + calc(var(--u) * 6)); }
+html[data-view="wide"] .swiper-slide[data-type="collage"] .mega { --fs: calc(var(--u) * 3.6); }
+html[data-view="wide"] .swiper-slide[data-type="collage"] .card > .collage { position: absolute; margin: 0; height: auto; width: auto;
+  left: var(--pad); right: var(--pad); top: calc(var(--padv) + calc(var(--u) * 17.5)); bottom: calc(var(--padv) + calc(var(--u) * 4.5)); }
+html[data-view="wide"] .collage img { border-radius: calc(var(--u) * .4); }
+
+/* ---- Inicio en vista ancha: la maqueta es del motor (dos columnas); aquí solo ajustes de estilo ---- */
+html[data-view="wide"] #splash { justify-content: center; padding: 0 var(--pad); }
+html[data-view="wide"] body[data-state="ready"] #splash h1 { font-size: calc(var(--u) * 11); line-height: .9; }
+html[data-view="wide"] #splash::before, html[data-view="wide"] #splash::after { left: 72%; top: 50%; width: calc(var(--u) * 18); margin: calc(var(--u) * -9) 0 0 calc(var(--u) * -9); }
+html[data-view="wide"] #splash .field input:not([type=checkbox]), html[data-view="wide"] #splash .field select { border-radius: .9em; }

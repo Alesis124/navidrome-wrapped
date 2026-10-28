@@ -1,0 +1,11 @@
+.git
+.env
+cache
+demo
+scripts
+themes
+*.md
+__pycache__
+*.pyc
+*.zip
+theme-kit

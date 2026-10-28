@@ -1,0 +1,189 @@
+{
+  "name": "Frecuencia",
+  "author": "Alesis",
+  "version": "1.5.0",
+  "description": "Tu año como una señal: los colores salen de cada carátula, la tipografía y el fondo respiran con la música, y cada cambio de diapositiva lanza una onda desde abajo.",
+  "tokens": {
+    "--bg": "#08070c",
+    "--fg": "#f6f2ea",
+    "--accent": "#ffb02e",
+    "--font": "'Frecuencia Text', system-ui, -apple-system, 'Segoe UI', sans-serif",
+    "--display": "'Frecuencia Display', 'Arial Narrow', Impact, sans-serif",
+    "--f-text": "'Frecuencia Text', system-ui, -apple-system, 'Segoe UI', sans-serif",
+    "--f-display": "'Frecuencia Display', 'Arial Narrow', Impact, sans-serif"
+  },
+  "palette": [
+    "#4a1d3f",
+    "#12385a",
+    "#3a2a6b",
+    "#0f4a43",
+    "#6a2d12",
+    "#1c2d6b"
+  ],
+  "fonts": [
+    {
+      "family": "Frecuencia Display",
+      "src": "fonts/frecuencia-display.woff2",
+      "weight": "500 900"
+    },
+    {
+      "family": "Frecuencia Text",
+      "src": "fonts/frecuencia-text.woff2",
+      "weight": "400 800"
+    }
+  ],
+  "css": [
+    "theme.css",
+    "wide.css"
+  ],
+  "script": "theme.js",
+  "swiper": {
+    "effect": "creative",
+    "speed": 850,
+    "creativeEffect": {
+      "limitProgress": 1,
+      "shadowPerProgress": true,
+      "prev": {
+        "translate": [
+          0,
+          "-22%",
+          -1
+        ],
+        "scale": 0.92,
+        "opacity": 0,
+        "shadow": true
+      },
+      "next": {
+        "translate": [
+          0,
+          "100%",
+          0
+        ]
+      }
+    }
+  },
+  "audio": {
+    "enabled": true,
+    "fade": 1.2
+  },
+  "slides": [
+    {
+      "type": "intro",
+      "duration": 5200
+    },
+    {
+      "type": "minutes",
+      "duration": 7000
+    },
+    {
+      "type": "race",
+      "duration": 17500
+    },
+    {
+      "type": "top-tracks",
+      "duration": 8000
+    },
+    {
+      "type": "number-one",
+      "duration": 8500
+    },
+    {
+      "type": "discoveries",
+      "duration": 7000
+    },
+    {
+      "type": "age",
+      "duration": 8200
+    },
+    {
+      "type": "hour",
+      "duration": 7500
+    },
+    {
+      "type": "night",
+      "duration": 7000
+    },
+    {
+      "type": "loop",
+      "duration": 6500
+    },
+    {
+      "type": "repeat",
+      "duration": 6500
+    },
+    {
+      "type": "outro",
+      "duration": 7500
+    },
+    {
+      "type": "collage",
+      "duration": 60000
+    }
+  ],
+  "strings": {
+    "splash_title": "Sintoniza<br>tu {year}",
+    "splash_button": "Dar al play",
+    "intro_lead": "El año de {user}",
+    "intro_line": "Así sonó.<br>Sube el volumen.",
+    "minutes_lead": "Este año le diste al play durante",
+    "minutes_unit": "minutos",
+    "minutes_note": "Eso es el <b data-fx=\"pct\"></b> de tu año: unos <b data-fx=\"span\"></b> de música sin parar.",
+    "minutes_detail": "{plays} reproducciones, {artists} artistas y {tracks} canciones distintas.",
+    "artists_lead": "Los que más sonaron",
+    "artists_unit": "escuchas",
+    "tracks_lead": "Las que no pudiste soltar",
+    "tracks_unit": "veces",
+    "number_one_lead": "Tu canción del año",
+    "number_one_unit": "veces en tu {year}",
+    "discoveries_lead": "Este año descubriste",
+    "discoveries_unit": "canciones nuevas",
+    "discoveries_artists": "Y {new_artists} artistas que no conocías.",
+    "discoveries_top": "Las que más se quedaron",
+    "hour_lead": "Tu hora favorita",
+    "hour_detail": "Tu día más intenso fue el <b>{busiest_day}</b>, con {busiest_plays} reproducciones. Tu racha más larga: <b>{streak} días</b> seguidos.",
+    "night_lead": "Hay noches que no se acaban",
+    "night_last": "A las <b>{night_time}</b> todavía sonaba «{night_track}».",
+    "night_unit": "{night_plays} reproducciones entre la medianoche y las 6, el {night_share}% de tu año.",
+    "loop_lead": "Modo bucle",
+    "loop_text": "El {loop_day} pusiste «<b>{loop_track}</b>» una y otra vez.",
+    "repeat_lead": "Disco rayado",
+    "repeat_title": "{repeat_times} seguidas",
+    "repeat_text": "«<b>{repeat_track}</b>», sin soltarla.",
+    "outro_lead": "Fin de la señal",
+    "outro_title": "Hasta<br>{next_year}",
+    "outro_artist": "Artista del año",
+    "outro_track": "Canción del año",
+    "outro_minutes": "Minutos escuchados",
+    "outro_hint": "Guarda cualquier tarjeta con el botón de descarga.",
+    "gate_title": "¿Quién<br>sintoniza?",
+    "gate_hint": "Escribe tu usuario de Navidrome y elige el año.",
+    "gate_button": "Ver mi Wrapped",
+    "nav_intro": "Sintonía",
+    "nav_minutes": "Minutos",
+    "nav_top_artists": "Artistas",
+    "nav_top_tracks": "Canciones",
+    "nav_number_one": "Tu nº 1",
+    "nav_discoveries": "Descubrimientos",
+    "nav_hour": "Tu hora",
+    "nav_night": "Madrugada",
+    "nav_loop": "Bucle",
+    "nav_repeat": "Disco rayado",
+    "nav_outro": "Fin de la señal",
+    "collage_title": "Tu {year},<br>de un vistazo",
+    "collage_wait": "Montando tu collage…",
+    "collage_label": "Collage con todas las diapositivas",
+    "nav_collage": "Collage",
+    "race_lead": "La carrera del año",
+    "race_end": "<b>{winner_name}</b> ganó el año con {winner_plays} reproducciones.",
+    "age_lead": "Según lo que escuchas, tienes",
+    "age_unit": "años de oído",
+    "age_detail": "Tu música gira en torno a <b>{median_year}</b>, y lo que más suena son los <b>{decade}s</b> ({decade_share} %).",
+    "age_extremes": "La más antigua: «{oldest_title}» ({oldest_year}). La más nueva: «{newest_title}» ({newest_year}).",
+    "age_note": "Estimación para pasar el rato.",
+    "nav_race": "La carrera",
+    "nav_age": "Edad musical",
+    "pull_hint": "Desliza para volver al inicio",
+    "pull_release": "Suelta para ir al inicio"
+  },
+  "wide": true
+}

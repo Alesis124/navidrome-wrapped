@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <script>
+    /* Vista inicial antes del primer pintado (si no, un fotograma sale en modo móvil al cargar o volver al inicio) */
+    document.documentElement.dataset.view =
+      (innerWidth >= 1000 && innerWidth / innerHeight >= 1.25) ? 'wide' : 'phone';
+  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Navidrome Wrapped</title>
+  <link rel="stylesheet" href="vendor/swiper-bundle.min.css">
+  <link rel="stylesheet" href="vendor/fa/fa.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" type="image/png" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#0b0b12">
+  <!-- El CSS, las fuentes y las plantillas del tema se cargan desde /api/themes -->
+</head>
+<body data-state="boot">
+  <div id="app">
+    <!-- Escritorio: panel izquierdo con las diapositivas. En móvil no se ve. -->
+    <aside id="rail-l" aria-label="Diapositivas">
+      <a class="brand" id="brand" href="./" title="Volver al inicio">Navidrome<br>Wrapped</a>
+      <nav id="toc"></nav>
+    </aside>
+
+    <main id="stage">
+      <div id="progress" aria-hidden="true"></div>
+      <div class="hud">
+        <button id="home" aria-label="Volver al inicio" title="Volver al inicio (H)"><i class="fa fa-house" aria-hidden="true"></i></button>
+        <div class="vol">
+          <button id="mute" aria-label="Silenciar" title="Silenciar (M)"><i class="fa fa-volume-high" aria-hidden="true"></i></button>
+          <div class="vol-pop"><input id="volume" type="range" min="0" max="1" step="0.05" value="1" aria-label="Volumen"></div>
+        </div>
+        <button id="save" aria-label="Descargar tarjeta" title="Descargar tarjeta (S)"><i class="fa fa-download" aria-hidden="true"></i></button>
+      </div>
+      <div class="swiper"><div class="swiper-wrapper" id="slides"></div></div>
+
+      <div id="splash">
+        <h1 id="splash-title"></h1>
+        <p id="splash-msg" role="status"></p>
+        <!-- Dos modos: «gate» (escribir usuario y elegir año) y «ready» (empezar) -->
+        <form id="who" data-mode="ready" autocomplete="off" novalidate>
+          <div class="fields">
+            <label class="field"><span>Tu usuario de Navidrome</span>
+              <input id="user" name="user" type="text" inputmode="text" autocapitalize="off" autocorrect="off"
+                     spellcheck="false" maxlength="64" placeholder="Escribe tu usuario" required></label>
+            <label class="field"><span>Año</span>
+              <select id="year" name="year" disabled></select></label>
+          </div>
+          <button id="go" type="submit"></button>
+        </form>
+        <div id="options">
+          <button id="change" type="button" class="opt-btn">Cambiar usuario o año</button>
+          <label class="opt-sel"><span>Tema</span><select id="theme-pick" aria-label="Tema"></select></label>
+          <button id="import-open" type="button" class="opt-btn">Importar tema (.zip)</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Escritorio: panel derecho con la sesión, opciones y atajos. -->
+    <aside id="rail-r" aria-label="Opciones">
+      <div id="who-sum"></div>
+      <div id="options-slot"></div>
+      <ul id="keys">
+        <li><kbd>←</kbd> <kbd>→</kbd> <kbd>Espacio</kbd> <span>cambiar de tarjeta</span></li>
+        <li><kbd>M</kbd> <span>silenciar la música</span></li>
+        <li><kbd>S</kbd> <span>guardar la tarjeta como imagen</span></li>
+        <li><kbd>H</kbd> <span>volver al inicio</span></li>
+        <li><span>Mantén pulsado para pausar</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <!-- Al descargar una tarjeta en un ordenador: ¿apaisada o vertical? -->
+  <dialog id="savechoice" aria-labelledby="sc-title">
+    <form method="dialog" id="sc-form">
+      <h2 id="sc-title">Descargar tarjeta</h2>
+      <p class="imp-note">¿Para qué pantalla quieres la imagen?</p>
+      <div class="sc-row">
+        <button type="submit" value="wide" class="sc-opt"><i class="fa fa-desktop" aria-hidden="true"></i><b>Ordenador</b><span>Apaisada</span></button>
+        <button type="submit" value="phone" class="sc-opt"><i class="fa fa-mobile-screen" aria-hidden="true"></i><b>Móvil</b><span>Vertical 9:16</span></button>
+      </div>
+      <div class="imp-row"><button type="submit" value="cancel" class="opt-btn">Cancelar</button></div>
+    </form>
+  </dialog>
+  <div id="loader" role="status" aria-label="Cargando"></div>
+  <div id="shotwait" hidden role="status">Preparando la imagen…</div>
+
+  <dialog id="importer" aria-labelledby="imp-title">
+    <form id="imp-form">
+      <h2 id="imp-title">Importar tema</h2>
+      <p class="imp-note">Sube un <code>.zip</code> con <code>theme.json</code>. Un tema puede ejecutar código en el
+        navegador de quien lo abra: importa solo temas de gente en la que confíes.</p>
+      <label class="field"><span>Fichero .zip</span>
+        <input id="imp-file" type="file" accept=".zip,application/zip" required></label>
+      <label class="field"><span>Clave de administrador</span>
+        <input id="imp-key" type="password" autocomplete="off" required></label>
+      <label class="check"><input id="imp-force" type="checkbox"> <span>Sustituir si ya existe</span></label>
+      <p id="imp-msg" role="status"></p>
+      <div class="imp-row">
+        <button type="button" id="imp-close" class="opt-btn">Cerrar</button>
+        <button type="submit" id="imp-go" class="opt-btn primary">Importar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Los temas con engine "react" piden estos módulos por nombre; no se descargan hasta que alguno los importa -->
+  <script type="importmap">
+  {"imports":{
+    "react":"/vendor/react/react.js",
+    "react/jsx-runtime":"/vendor/react/jsx-runtime.js",
+    "react-dom/client":"/vendor/react/react-dom-client.js",
+    "motion/react":"/vendor/react/motion-react.js"}}
+  </script>
+  <script src="vendor/swiper-bundle.min.js"></script>
+  <script src="vendor/html2canvas.min.js"></script>
+  <script type="module" src="js/story.js"></script>
+</body>
+</html>

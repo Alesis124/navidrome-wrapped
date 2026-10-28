@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">
+  <title id="title">Disco de vinilo</title>
+  <desc id="desc">Ilustración vectorial de un disco de vinilo negro con surcos concéntricos y etiqueta roja central.</desc>
+  <defs>
+    <radialGradient id="record" cx="38%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#333333"/>
+      <stop offset="0.48" stop-color="#111111"/>
+      <stop offset="0.82" stop-color="#242424"/>
+      <stop offset="1" stop-color="#050505"/>
+    </radialGradient>
+    <radialGradient id="label" cx="32%" cy="25%" r="85%">
+      <stop offset="0" stop-color="#ef4444"/>
+      <stop offset="1" stop-color="#991b1b"/>
+    </radialGradient>
+    <clipPath id="discClip"><circle cx="400" cy="400" r="350"/></clipPath>
+  </defs>
+  <circle cx="400" cy="400" r="365" fill="#000" opacity=".12"/>
+  <circle cx="400" cy="400" r="350" fill="url(#record)" stroke="#080808" stroke-width="5"/>
+  <g clip-path="url(#discClip)" fill="none" stroke-linecap="round">
+    <circle cx="400" cy="400" r="326" stroke="#555" stroke-width="1.5" opacity=".42"/>
+    <circle cx="400" cy="400" r="317" stroke="#777" stroke-width="1" opacity=".3"/>
+    <circle cx="400" cy="400" r="307" stroke="#777" stroke-width="1.5" opacity=".28"/>
+    <circle cx="400" cy="400" r="296" stroke="#777" stroke-width="1" opacity=".4"/>
+    <circle cx="400" cy="400" r="285" stroke="#777" stroke-width="1.5" opacity=".28"/>
+    <circle cx="400" cy="400" r="274" stroke="#777" stroke-width="1" opacity=".36"/>
+    <circle cx="400" cy="400" r="263" stroke="#777" stroke-width="1.5" opacity=".3"/>
+    <circle cx="400" cy="400" r="252" stroke="#777" stroke-width="1" opacity=".4"/>
+    <circle cx="400" cy="400" r="241" stroke="#777" stroke-width="1.5" opacity=".27"/>
+    <circle cx="400" cy="400" r="230" stroke="#777" stroke-width="1" opacity=".4"/>
+    <circle cx="400" cy="400" r="219" stroke="#777" stroke-width="1.5" opacity=".3"/>
+    <circle cx="400" cy="400" r="208" stroke="#777" stroke-width="1" opacity=".38"/>
+    <circle cx="400" cy="400" r="197" stroke="#777" stroke-width="1.5" opacity=".3"/>
+    <circle cx="400" cy="400" r="186" stroke="#777" stroke-width="1" opacity=".4"/>
+    <circle cx="400" cy="400" r="175" stroke="#777" stroke-width="1.5" opacity=".28"/>
+    <circle cx="400" cy="400" r="164" stroke="#777" stroke-width="1" opacity=".4"/>
+    <circle cx="400" cy="400" r="153" stroke="#777" stroke-width="1.5" opacity=".3"/>
+    <circle cx="400" cy="400" r="142" stroke="#777" stroke-width="1" opacity=".38"/>
+  </g>
+  <circle cx="400" cy="400" r="116" fill="url(#label)" stroke="#ef4444" stroke-width="2"/>
+  <circle cx="400" cy="400" r="101" fill="none" stroke="#fecaca" stroke-width="1.5" opacity=".7"/>
+  <circle cx="400" cy="400" r="88" fill="none" stroke="#7f1d1d" stroke-width="1.5" opacity=".8"/>
+
+  <text x="400" y="407" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800" letter-spacing="2" fill="#fff">Wrapped</text>
+
+  <circle cx="400" cy="400" r="8" fill="#f5f5f5"/>
+  <circle cx="400" cy="400" r="3" fill="#171717"/>
+</svg>
