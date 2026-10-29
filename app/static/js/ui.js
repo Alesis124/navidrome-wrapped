@@ -58,6 +58,11 @@ export function initChrome({ q, theme, config }) {
     sel.onchange = () => { const u = new URL(location.href); u.searchParams.set('theme', sel.value); location.href = u; };
   }).catch(() => { $('#theme-pick').closest('.opt-sel').hidden = true; });
 
+  // ---- Cerrar sesión (solo si el servidor tiene login)
+  const out = $('#logout');
+  out.hidden = !config.auth_enabled;
+  out.onclick = async () => { await fetch('/api/logout', { method: 'POST' }).catch(() => { }); location.href = '/login'; };
+
   // ---- Importar tema
   const dlg = $('#importer');
   const imp = $('#import-open');

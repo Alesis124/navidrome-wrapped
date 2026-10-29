@@ -2,8 +2,10 @@ name: navidrome-wrapped
 
 services:
   wrapped:
+    # Imagen publicada por GitHub Actions: `docker compose pull && docker compose up -d` la actualiza.
+    # Con `up -d --build` se construye en local (y se queda con este mismo nombre). Fija una versión con WRAPPED_IMAGE.
+    image: ${WRAPPED_IMAGE:-ghcr.io/alesis124/navidrome-wrapped:latest}
     build: .
-    image: navidrome-wrapped:latest
     container_name: navidrome-wrapped
     restart: unless-stopped
     user: "${PUID:-1000}:${PGID:-1000}"
@@ -19,6 +21,8 @@ services:
       THEMES_DIR: /themes
       WRAPPED_THEME: ${WRAPPED_THEME:-}   # vacío = tema con el nombre del año, o frecuencia
       DB_ACCESS: ${DB_ACCESS:-auto}   # auto | direct | snapshot
+      AUTH_USER: ${AUTH_USER:-}        # login opcional (usuario + contraseña; vacíos = sin login)
+      AUTH_PASSWORD: ${AUTH_PASSWORD:-}
       ADMIN_KEY: ${ADMIN_KEY:-}      # clave para importar temas .zip desde la web (vacío = desactivado)
     volumes:
       # Carpeta de datos de Navidrome (la que contiene navidrome.db), SOLO LECTURA.

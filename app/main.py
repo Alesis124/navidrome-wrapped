@@ -6,24 +6,61 @@ import json
 import re
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 import mimetypes
 
-from . import audio, db, queries, stats, themes
+from . import audio, auth, db, queries, stats, themes
+from .version import __version__
 from .config import ADMIN_KEY, DEFAULT_USER, DEFAULT_YEAR, MAX_THEME_ZIP
 
-app = FastAPI(title="Navidrome Wrapped")
+app = FastAPI(title="Navidrome Wrapped", version=__version__)
 mimetypes.add_type("font/woff2", ".woff2")
 mimetypes.add_type("text/javascript", ".js")
 CACHE = {"Cache-Control": "public, max-age=86400"}
 
 
+@app.get("/login")
+def login_page():
+    if not auth.ENABLED:
+        return RedirectResponse("/", status_code=303)
+    return FileResponse(Path(__file__).parent / "static" / "login.html", headers={"Cache-Control": "no-store"})
+
+
+@app.post("/api/login")
+async def login(request: Request):
+    if not auth.ENABLED:
+        return {"ok": True}
+    ip = auth.client_ip(request)
+    wait = auth.locked(ip)
+    if wait:
+        return JSONResponse({"detail": f"Demasiados intentos. Espera {wait} s."}, status_code=429)
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    if not auth.check_credentials(str(body.get("user", "")), str(body.get("password", ""))):
+        auth.fail(ip)
+        await asyncio.sleep(0.6)
+        return JSONResponse({"detail": "Usuario o contraseña incorrectos"}, status_code=401)
+    auth.clear(ip)
+    resp = JSONResponse({"ok": True})
+    resp.set_cookie(auth.COOKIE, auth.make_token(), max_age=auth.TTL, httponly=True, samesite="lax", secure=auth.secure(request), path="/")
+    return resp
+
+
+@app.post("/api/logout")
+def logout():
+    resp = JSONResponse({"ok": True})
+    resp.delete_cookie(auth.COOKIE, path="/")
+    return resp
+
+
 @app.get("/api/health")
 def health():
     with db.connect() as conn:
-        return {"ok": True, "mode": db.detect_mode(conn), "db_access": db.source()}
+        return {"ok": True, "version": __version__, "mode": db.detect_mode(conn), "db_access": db.source()}
 
 
 @app.get("/api/users")
@@ -44,7 +81,7 @@ def resolve_user(conn, name: str) -> str | None:
 
 @app.get("/api/config")
 def config():
-    return {"default_year": DEFAULT_YEAR, "import_enabled": bool(ADMIN_KEY)}
+    return {"default_year": DEFAULT_YEAR, "import_enabled": bool(ADMIN_KEY), "auth_enabled": auth.ENABLED, "version": __version__}
 
 
 @app.get("/api/years")
@@ -152,6 +189,9 @@ async def clip(track_id: str, seconds: int | None = Query(None, ge=5, le=60)):
 async def cover(track_id: str):
     return FileResponse(await audio.get_cover(track_id),
                         media_type="image/jpeg", headers=CACHE)
+
+
+app.middleware("http")(auth.middleware)
 
 
 @app.middleware("http")

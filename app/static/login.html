@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Navidrome Wrapped</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" type="image/png" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      background: #0b0a10;
+      color: #f4efe6;
+      font: 16px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+      padding: 16px;
+    }
+
+    form {
+      width: min(100%, 340px);
+      display: grid;
+      gap: 14px;
+    }
+
+    img {
+      width: 72px;
+      height: 72px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0;
+      opacity: .65;
+      font-size: .9rem;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: .85rem;
+      opacity: .85;
+    }
+
+    input {
+      font: inherit;
+      color: inherit;
+      background: #17151f;
+      border: 1px solid #2c2938;
+      border-radius: 10px;
+      padding: 11px 12px;
+    }
+
+    input:focus-visible {
+      outline: 2px solid #ffb02e;
+      outline-offset: 1px;
+    }
+
+    button {
+      font: inherit;
+      font-weight: 700;
+      color: #1a1205;
+      background: #ffb02e;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: default;
+    }
+
+    #msg {
+      min-height: 1.2em;
+      color: #ff8a7a;
+      font-size: .88rem;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <form id="f" autocomplete="on">
+    <img src="favicon.svg" alt="">
+    <h1>Navidrome Wrapped</h1>
+    <p>Inicia sesión para ver tu resumen.</p>
+    <label>Usuario <input id="u" name="username" autocomplete="username" autocapitalize="none" required
+        autofocus></label>
+    <label>Contraseña <input id="p" name="password" type="password" autocomplete="current-password" required></label>
+    <button id="go" type="submit">Entrar</button>
+    <p id="msg" role="alert"></p>
+  </form>
+  <script>
+    const f = document.getElementById('f'),
+      msg = document.getElementById('msg'),
+      go = document.getElementById('go');
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      go.disabled = true;
+      msg.textContent = '';
+      try {
+        const r = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user: f.u.value,
+            password: f.p.value
+          })
+        });
+        if (r.ok) {
+          const n = new URLSearchParams(location.search).get('next') || '/';
+          location.replace(n.startsWith('/') && !n.startsWith('//') ? n : '/');
+          return;
+        }
+        msg.textContent = (await r.json().catch(() => ({}))).detail || 'No se pudo iniciar sesión';
+      } catch {
+        msg.textContent = 'No hay conexión con el servidor';
+      }
+      go.disabled = false;
+      f.p.select();
+    });
+  </script>
+</body>
+
+</html>

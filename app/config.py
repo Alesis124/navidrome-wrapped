@@ -14,3 +14,5 @@ THEMES_DIR = os.getenv("THEMES_DIR", "/themes")
 DEFAULT_THEME = os.getenv("WRAPPED_THEME", "")
 ADMIN_KEY = os.getenv("ADMIN_KEY", "")   # vacío = importar temas desde la web desactivado
 MAX_THEME_ZIP = 30 * 1024 * 1024
+AUTH_USER = os.getenv("AUTH_USER", "").strip()          # usuario y contraseña para entrar a la web (los dos vacíos = sin login)
+AUTH_PASSWORD = os.getenv("AUTH_PASSWORD", "")

@@ -15,6 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Read app version
+        id: ver
+        run: echo "version=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' app/version.py)" >> "$GITHUB_OUTPUT"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -34,7 +38,8 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            latest
+            type=raw,value=latest
+            type=raw,value=${{ steps.ver.outputs.version }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

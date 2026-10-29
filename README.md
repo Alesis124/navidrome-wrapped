@@ -159,3 +159,30 @@ Los temas pueden elegir motor en `theme.json`: `"engine": "html"` (por defecto, 
 `"engine": "react"` (un componente de React con la librería `motion`, todo código abierto).
 El tema React «Remix» viene incluido: ábrelo con `/?theme=remix`. Guía completa en `THEMES.md` (sección «Motores») y herramientas de
 compilación en `theme-kit/`. Para desplegar no necesitas Node.
+
+
+## Login opcional
+
+Para que la web pida usuario y contraseña, pon en `.env`:
+
+    AUTH_USER=alesis
+    AUTH_PASSWORD=una-contraseña-larga
+
+y ejecuta `./deploy.sh`. Con los dos vacíos (o sin esas líneas) no hay login. Si defines solo uno, el servidor no arranca
+y te lo dice. La sesión dura 30 días (cookie firmada y solo HTTP); al cambiar el usuario o la contraseña se cierran todas.
+Tras 5 intentos fallidos desde una misma IP hay que esperar 5 minutos. En la pantalla de inicio aparece «Cerrar sesión».
+Protege toda la web (también la API, las carátulas y los clips). Si la expones a internet, ponla detrás de HTTPS; y si la
+contraseña lleva `$`, escríbela como `$$` en el `.env` (lo exige Docker Compose).
+
+
+## Actualizar y versiones
+
+La versión está en `app/version.py` (se ve en `/api/health`). Cada `push` a `main` publica en GHCR la imagen
+`ghcr.io/alesis124/navidrome-wrapped` con las etiquetas `latest` y la versión (por ejemplo `1.1.0`). Para publicar una nueva,
+sube el número en `app/version.py` y anótalo en `CHANGELOG.md`.
+
+    docker compose pull && docker compose up -d      # actualizar a la última imagen publicada
+    ./deploy.sh                                      # o construirla en el servidor desde el código
+
+Para que otras personas puedan hacer `pull`, el paquete tiene que ser público (GitHub → tu perfil → Packages →
+navidrome-wrapped → Package settings → Change visibility).

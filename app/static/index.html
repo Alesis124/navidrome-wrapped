@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <script>
     /* Vista inicial antes del primer pintado (si no, un fotograma sale en modo móvil al cargar o volver al inicio) */
@@ -18,6 +19,7 @@
   <meta name="theme-color" content="#0b0b12">
   <!-- El CSS, las fuentes y las plantillas del tema se cargan desde /api/themes -->
 </head>
+
 <body data-state="boot">
   <div id="app">
     <!-- Escritorio: panel izquierdo con las diapositivas. En móvil no se ve. -->
@@ -29,14 +31,20 @@
     <main id="stage">
       <div id="progress" aria-hidden="true"></div>
       <div class="hud">
-        <button id="home" aria-label="Volver al inicio" title="Volver al inicio (H)"><i class="fa fa-house" aria-hidden="true"></i></button>
+        <button id="home" aria-label="Volver al inicio" title="Volver al inicio (H)"><i class="fa fa-house"
+            aria-hidden="true"></i></button>
         <div class="vol">
-          <button id="mute" aria-label="Silenciar" title="Silenciar (M)"><i class="fa fa-volume-high" aria-hidden="true"></i></button>
-          <div class="vol-pop"><input id="volume" type="range" min="0" max="1" step="0.05" value="1" aria-label="Volumen"></div>
+          <button id="mute" aria-label="Silenciar" title="Silenciar (M)"><i class="fa fa-volume-high"
+              aria-hidden="true"></i></button>
+          <div class="vol-pop"><input id="volume" type="range" min="0" max="1" step="0.05" value="1"
+              aria-label="Volumen"></div>
         </div>
-        <button id="save" aria-label="Descargar tarjeta" title="Descargar tarjeta (S)"><i class="fa fa-download" aria-hidden="true"></i></button>
+        <button id="save" aria-label="Descargar tarjeta" title="Descargar tarjeta (S)"><i class="fa fa-download"
+            aria-hidden="true"></i></button>
       </div>
-      <div class="swiper"><div class="swiper-wrapper" id="slides"></div></div>
+      <div class="swiper">
+        <div class="swiper-wrapper" id="slides"></div>
+      </div>
 
       <div id="splash">
         <h1 id="splash-title"></h1>
@@ -46,7 +54,7 @@
           <div class="fields">
             <label class="field"><span>Tu usuario de Navidrome</span>
               <input id="user" name="user" type="text" inputmode="text" autocapitalize="off" autocorrect="off"
-                     spellcheck="false" maxlength="64" placeholder="Escribe tu usuario" required></label>
+                spellcheck="false" maxlength="64" placeholder="Escribe tu usuario" required></label>
             <label class="field"><span>Año</span>
               <select id="year" name="year" disabled></select></label>
           </div>
@@ -56,6 +64,7 @@
           <button id="change" type="button" class="opt-btn">Cambiar usuario o año</button>
           <label class="opt-sel"><span>Tema</span><select id="theme-pick" aria-label="Tema"></select></label>
           <button id="import-open" type="button" class="opt-btn">Importar tema (.zip)</button>
+          <button id="logout" type="button" class="opt-btn" hidden>Cerrar sesión</button>
         </div>
       </div>
     </main>
@@ -80,8 +89,10 @@
       <h2 id="sc-title">Descargar tarjeta</h2>
       <p class="imp-note">¿Para qué pantalla quieres la imagen?</p>
       <div class="sc-row">
-        <button type="submit" value="wide" class="sc-opt"><i class="fa fa-desktop" aria-hidden="true"></i><b>Ordenador</b><span>Apaisada</span></button>
-        <button type="submit" value="phone" class="sc-opt"><i class="fa fa-mobile-screen" aria-hidden="true"></i><b>Móvil</b><span>Vertical 9:16</span></button>
+        <button type="submit" value="wide" class="sc-opt"><i class="fa fa-desktop"
+            aria-hidden="true"></i><b>Ordenador</b><span>Apaisada</span></button>
+        <button type="submit" value="phone" class="sc-opt"><i class="fa fa-mobile-screen"
+            aria-hidden="true"></i><b>Móvil</b><span>Vertical 9:16</span></button>
       </div>
       <div class="imp-row"><button type="submit" value="cancel" class="opt-btn">Cancelar</button></div>
     </form>
@@ -109,7 +120,7 @@
 
   <!-- Los temas con engine "react" piden estos módulos por nombre; no se descargan hasta que alguno los importa -->
   <script type="importmap">
-  {"imports":{
+    {"imports":{
     "react":"/vendor/react/react.js",
     "react/jsx-runtime":"/vendor/react/jsx-runtime.js",
     "react-dom/client":"/vendor/react/react-dom-client.js",
@@ -119,4 +130,5 @@
   <script src="vendor/html2canvas.min.js"></script>
   <script type="module" src="js/story.js"></script>
 </body>
+
 </html>
