@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **翻訳について：** このプロジェクトの翻訳はAIを使用して作成されており、誤りが含まれる場合があります。
 
@@ -9,7 +9,7 @@ NavidromeのWrapped風年間まとめです。よく聴いたアーティスト�
 - **バックエンド：** FastAPI、読み取り専用SQLite、音声クリップ用ffmpeg。
 - **フロントエンド：** HTML/CSS/JavaScriptとSwiper。ビルドやCDNは不要です。
 - **テーマ：** 見た目、テキスト、スライド順をカスタマイズできます。[THEMES.md](THEMES.md)を参照してください。
-- **言語：** 英語、ドイツ語、スペイン語、ロシア語、中国語、日本語、韓国語、アラビア語。
+- **言語：** 英語、ドイツ語、スペイン語、ポルトガル語、フランス語、イタリア語、オランダ語、ロシア語、中国語、日本語、韓国語、アラビア語。
 - **アクセシビリティ：** キーボードでの一時停止、見えるフォーカス、スクリーンリーダー向けのスライド案内に対応。正式な監査は未実施で、WCAG準拠を保証するものではありません。
 
 ## プレビュー
@@ -37,7 +37,7 @@ cp .env.example .env
 | `NAVIDROME_NETWORK` | NavidromeのDockerネットワーク |
 | `NAVIDROME_DATA_DIR` | `navidrome.db` があるホスト側のディレクトリ |
 | `MUSIC_DIR_HOST` | 音楽ファイルがあるホスト側のディレクトリ |
-| `WRAPPED_LANGUAGE` | `en`（既定）、`de`、`es`、`pt`、`fr`、`ru`、`zh`、`ja`、`ko`、`ar` |
+| `WRAPPED_LANGUAGE` | `en`（既定）、`de`、`es`、`pt`、`fr`、`it`、`nl`、`ru`、`zh`、`ja`、`ko`、`ar` |
 | `ADMIN_KEY` | ZIPテーマのインポートキー |
 | `PUID` / `PGID` | ディレクトリを読み取るユーザー/グループID |
 

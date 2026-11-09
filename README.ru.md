@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **Примечание о переводе:** Переводы проекта выполнены с помощью ИИ и могут содержать ошибки.
 
@@ -37,7 +37,7 @@ cp .env.example .env
 | `NAVIDROME_NETWORK` | Сеть Docker для Navidrome |
 | `NAVIDROME_DATA_DIR` | Каталог хоста с `navidrome.db` |
 | `MUSIC_DIR_HOST` | Каталог хоста с музыкой |
-| `WRAPPED_LANGUAGE` | `en` (по умолчанию), `de`, `es`, `pt`, `fr`, `ru`, `zh`, `ja`, `ko` или `ar` |
+| `WRAPPED_LANGUAGE` | `en` (по умолчанию), `de`, `es`, `pt`, `fr`, `it`, `nl`, `ru`, `zh`, `ja`, `ko` или `ar` |
 | `ADMIN_KEY` | Ключ для импорта ZIP-тем |
 | `PUID` / `PGID` | Идентификаторы пользователя и группы с доступом на чтение |
 

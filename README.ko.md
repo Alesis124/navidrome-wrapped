@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **번역 안내:** 이 프로젝트의 번역은 AI로 작성되어 오류가 있을 수 있습니다.
 
@@ -9,7 +9,7 @@ Navidrome을 위한 Wrapped 스타일 연간 요약입니다. 가장 많이 들�
 - **백엔드:** FastAPI, 읽기 전용 SQLite, 오디오 클립용 ffmpeg.
 - **프런트엔드:** HTML/CSS/JavaScript와 Swiper. 빌드 단계나 CDN이 필요하지 않습니다.
 - **테마:** 모양, 문구, 슬라이드 순서를 바꿀 수 있습니다. [THEMES.md](THEMES.md)를 참고하세요.
-- **언어:** 영어, 독일어, 스페인어, 러시아어, 중국어, 일본어, 한국어, 아랍어.
+- **언어:** 영어, 독일어, 스페인어, 포르투갈어, 프랑스어, 이탈리아어, 네덜란드어, 러시아어, 중국어, 일본어, 한국어, 아랍어.
 - **접근성:** 키보드 일시 정지, 표시되는 포커스, 스크린 리더용 슬라이드 안내를 지원합니다. 공식 감사를 받지 않았으며 WCAG 준수를 보장하지 않습니다.
 
 ## 미리보기
@@ -37,7 +37,7 @@ cp .env.example .env
 | `NAVIDROME_NETWORK` | Navidrome의 Docker 네트워크 |
 | `NAVIDROME_DATA_DIR` | `navidrome.db`가 있는 호스트 디렉터리 |
 | `MUSIC_DIR_HOST` | 음악 파일이 있는 호스트 디렉터리 |
-| `WRAPPED_LANGUAGE` | `en`(기본값), `de`, `es`, `pt`, `fr`, `ru`, `zh`, `ja`, `ko`, `ar` |
+| `WRAPPED_LANGUAGE` | `en`(기본값), `de`, `es`, `pt`, `fr`, `it`, `nl`, `ru`, `zh`, `ja`, `ko`, `ar` |
 | `ADMIN_KEY` | ZIP 테마 가져오기 키 |
 | `PUID` / `PGID` | 디렉터리를 읽을 수 있는 사용자/그룹 ID |
 

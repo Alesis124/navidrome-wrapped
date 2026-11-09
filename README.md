@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **Translation notice:** Translations in this project were made with AI and may contain errors.
 
@@ -57,7 +57,7 @@ It also sets `./themes` to owner `PUID:PGID` so the web app can install imported
 | `NAVIDROME_NETWORK` | Navidrome's Docker network: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
 | `NAVIDROME_DATA_DIR` | Host directory containing `navidrome.db` (the one Navidrome mounts at `/data`) |
 | `MUSIC_DIR_HOST` | Host directory containing the music (the same one Navidrome mounts at `/music`) |
-| `WRAPPED_LANGUAGE` | Interface language: `en` (default), `de`, `es`, `pt`, `fr` (French), `ru`, `zh`, `ja`, `ko`, or `ar` |
+| `WRAPPED_LANGUAGE` | Interface language: `en` (default), `de`, `es`, `pt`, `fr`, `it`, `nl`, `ru`, `zh`, `ja`, `ko`, or `ar` |
 | `NAVIDROME_USER` | Optional default user for the API only; the page asks for a user when opened |
 | `ADMIN_KEY` | Key for importing `.zip` themes from the web. If empty, `./deploy.sh` generates one; if left empty manually, importing is disabled |
 | `PUID` / `PGID` | User allowed to read those directories (`ls -ln /opt/navidrome/data`) |

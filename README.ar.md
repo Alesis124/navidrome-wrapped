@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **تنويه الترجمة:** أُعدّت الترجمات في هذا المشروع باستخدام الذكاء الاصطناعي، وقد تتضمن أخطاء.
 
@@ -9,7 +9,7 @@
 - **الخادم:** FastAPI وSQLite للقراءة فقط وffmpeg للمقاطع الصوتية.
 - **الواجهة:** HTML وCSS وJavaScript مع Swiper، دون حاجة إلى بناء أو CDN.
 - **السمات:** يمكن تخصيص المظهر والنصوص وترتيب الشرائح. راجع [THEMES.md](THEMES.md).
-- **اللغات:** الإنجليزية والألمانية والإسبانية والروسية والصينية واليابانية والكورية والعربية.
+- **اللغات:** الإنجليزية والألمانية والإسبانية والبرتغالية والفرنسية والإيطالية والهولندية والروسية والصينية واليابانية والكورية والعربية.
 - **إمكانية الوصول:** إيقاف مؤقت بلوحة المفاتيح، ومؤشر تركيز واضح، وإعلانات للشرائح لقارئات الشاشة. لم يُجرَ تدقيق رسمي ولا نضمن التوافق مع WCAG.
 
 ## معاينة
@@ -37,7 +37,7 @@ cp .env.example .env
 | `NAVIDROME_NETWORK` | شبكة Docker الخاصة بـ Navidrome |
 | `NAVIDROME_DATA_DIR` | مجلد المضيف الذي يحتوي على `navidrome.db` |
 | `MUSIC_DIR_HOST` | مجلد الموسيقى على المضيف |
-| `WRAPPED_LANGUAGE` | `en` (افتراضي) أو `de` أو `es` أو `pt` أو `fr` أو `ru` أو `zh` أو `ja` أو `ko` أو `ar` |
+| `WRAPPED_LANGUAGE` | `en` (افتراضي) أو `de` أو `es` أو `pt` أو `fr` أو `it` أو `nl` أو `ru` أو `zh` أو `ja` أو `ko` أو `ar` |
 | `ADMIN_KEY` | مفتاح استيراد السمات بصيغة ZIP |
 | `PUID` / `PGID` | معرف المستخدم/المجموعة اللذين يمكنهما قراءة المجلدات |
 

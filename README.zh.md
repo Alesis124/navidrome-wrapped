@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **翻译说明：** 本项目中的翻译由 AI 完成，可能存在错误。
 
@@ -9,7 +9,7 @@
 - **后端：** FastAPI、只读 SQLite，以及用于音频片段的 ffmpeg。
 - **前端：** HTML、CSS、JavaScript 和 Swiper；无需构建，也不依赖 CDN。
 - **主题：** 可自定义外观、文字和幻灯片顺序，详见 [THEMES.md](THEMES.md)。
-- **语言：** 英语、德语、西班牙语、俄语、中文、日语、韩语和阿拉伯语。
+- **语言：** 英语、德语、西班牙语、葡萄牙语、法语、意大利语、荷兰语、俄语、中文、日语、韩语和阿拉伯语。
 - **无障碍：** 支持键盘暂停、可见焦点，以及面向屏幕阅读器的幻灯片播报。尚未进行正式无障碍审计，也不保证符合 WCAG。
 
 ## 预览
@@ -37,7 +37,7 @@ cp .env.example .env
 | `NAVIDROME_NETWORK` | Navidrome 的 Docker 网络 |
 | `NAVIDROME_DATA_DIR` | 存放 `navidrome.db` 的主机目录 |
 | `MUSIC_DIR_HOST` | 存放音乐的主机目录 |
-| `WRAPPED_LANGUAGE` | `en`（默认）、`de`、`es`、`pt`、`fr`、`ru`、`zh`、`ja`、`ko` 或 `ar` |
+| `WRAPPED_LANGUAGE` | `en`（默认）、`de`、`es`、`pt`、`fr`、`it`、`nl`、`ru`、`zh`、`ja`、`ko` 或 `ar` |
 | `ADMIN_KEY` | 导入 ZIP 主题的密钥 |
 | `PUID` / `PGID` | 有权读取这些目录的用户/组 ID |
 

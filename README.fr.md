@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **Note sur les traductions :** Les traductions de ce projet ont été réalisées avec l’aide de l’IA et peuvent contenir des erreurs.
 
@@ -9,7 +9,7 @@ Un récapitulatif annuel de Navidrome dans le style Wrapped : artistes et titres
 - **Backend :** FastAPI, SQLite en lecture seule et ffmpeg pour les extraits audio.
 - **Frontend :** HTML/CSS/JavaScript avec Swiper, sans compilation ni CDN.
 - **Thèmes :** l’apparence, les textes et l’ordre des diapositives sont personnalisables. Voir [THEMES.md](THEMES.md).
-- **Langues :** anglais, allemand, espagnol, portugais, français, russe, chinois, japonais, coréen et arabe.
+- **Langues :** anglais, allemand, espagnol, portugais, français, italien, néerlandais, russe, chinois, japonais, coréen et arabe.
 - **Accessibilité :** pause au clavier, focus visible et annonces des diapositives pour les lecteurs d’écran. Aucune évaluation formelle n’a été réalisée et la conformité WCAG n’est pas garantie.
 
 ## Aperçu
@@ -37,7 +37,7 @@ Principaux paramètres dans `.env` :
 | `NAVIDROME_NETWORK` | Réseau Docker de Navidrome |
 | `NAVIDROME_DATA_DIR` | Répertoire hôte contenant `navidrome.db` |
 | `MUSIC_DIR_HOST` | Répertoire hôte contenant la musique |
-| `WRAPPED_LANGUAGE` | `en` (par défaut), `de`, `es`, `pt`, `fr`, `ru`, `zh`, `ja`, `ko` ou `ar` |
+| `WRAPPED_LANGUAGE` | `en` (par défaut), `de`, `es`, `pt`, `fr`, `it`, `nl`, `ru`, `zh`, `ja`, `ko` ou `ar` |
 | `ADMIN_KEY` | Clé d’importation des thèmes ZIP |
 | `PUID` / `PGID` | Identifiants utilisateur/groupe autorisés à lire ces répertoires |
 

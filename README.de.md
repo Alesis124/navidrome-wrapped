@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **Übersetzungshinweis:** Die Übersetzungen dieses Projekts wurden mit KI erstellt und können Fehler enthalten.
 
@@ -9,7 +9,7 @@ Ein Jahresrückblick für Navidrome im Wrapped-Stil: meistgehörte Künstler und
 - **Backend:** FastAPI, SQLite (schreibgeschützt) und ffmpeg für Audioclips.
 - **Frontend:** HTML, CSS und JavaScript mit Swiper; kein Build-Schritt und kein CDN erforderlich.
 - **Themes:** Aussehen, Texte und Reihenfolge der Folien lassen sich über Themes anpassen. Details: [THEMES.md](THEMES.md).
-- **Sprachen:** Englisch, Deutsch, Spanisch, Russisch, Chinesisch, Japanisch, Koreanisch und Arabisch.
+- **Sprachen:** Englisch, Deutsch, Spanisch, Portugiesisch, Französisch, Italienisch, Niederländisch, Russisch, Chinesisch, Japanisch, Koreanisch und Arabisch.
 - **Barrierefreiheit:** Pause per Tastatur, sichtbarer Fokus und Folienansagen für Screenreader. Keine formelle Prüfung oder WCAG-Konformität zugesichert.
 
 ## Vorschau
@@ -37,7 +37,7 @@ In `.env` sind insbesondere folgende Werte zu setzen:
 | `NAVIDROME_NETWORK` | Docker-Netzwerk von Navidrome |
 | `NAVIDROME_DATA_DIR` | Host-Verzeichnis mit `navidrome.db` |
 | `MUSIC_DIR_HOST` | Host-Verzeichnis mit der Musik |
-| `WRAPPED_LANGUAGE` | `en` (Standard), `de`, `es`, `pt`, `fr`, `ru`, `zh`, `ja`, `ko` oder `ar` |
+| `WRAPPED_LANGUAGE` | `en` (Standard), `de`, `es`, `pt`, `fr`, `it`, `nl`, `ru`, `zh`, `ja`, `ko` oder `ar` |
 | `ADMIN_KEY` | Schlüssel zum Importieren von ZIP-Themes |
 | `PUID` / `PGID` | Benutzer- und Gruppen-ID mit Leserechten |
 

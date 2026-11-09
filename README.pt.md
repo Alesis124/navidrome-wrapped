@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **Aviso de tradução:** As traduções deste projeto foram feitas com IA e podem conter erros.
 
@@ -37,7 +37,7 @@ Configurações principais em `.env`:
 | `NAVIDROME_NETWORK` | Rede Docker do Navidrome |
 | `NAVIDROME_DATA_DIR` | Diretório do host que contém `navidrome.db` |
 | `MUSIC_DIR_HOST` | Diretório do host com os arquivos de música |
-| `WRAPPED_LANGUAGE` | `en` (padrão), `de`, `es`, `pt`, `fr`, `ru`, `zh`, `ja`, `ko` ou `ar` |
+| `WRAPPED_LANGUAGE` | `en` (padrão), `de`, `es`, `pt`, `fr`, `it`, `nl`, `ru`, `zh`, `ja`, `ko` ou `ar` |
 | `ADMIN_KEY` | Chave para importar temas ZIP |
 | `PUID` / `PGID` | IDs de usuário/grupo com acesso de leitura aos diretórios |
 

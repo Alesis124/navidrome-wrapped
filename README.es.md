@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Italiano 🇮🇹](README.it.md) | [Nederlands 🇳🇱](README.nl.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **Aviso de traducción:** Las traducciones de este proyecto se hicieron con IA y pueden contener errores.
 
@@ -69,7 +69,7 @@ y además deja `./themes` con el dueño `PUID:PGID` para que la web pueda instal
 | `NAVIDROME_NETWORK` | Red Docker de Navidrome: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
 | `NAVIDROME_DATA_DIR` | Carpeta del host con `navidrome.db` (la que Navidrome monta en `/data`) |
 | `MUSIC_DIR_HOST` | Carpeta del host con la música (la misma que Navidrome monta en `/music`) |
-| `WRAPPED_LANGUAGE` | Idioma: `en` (inglés, predeterminado), `de` (alemán), `es` (español), `pt` (portugués), `fr` (francés), `ru` (ruso), `zh` (chino), `ja` (japonés), `ko` (coreano) o `ar` (árabe) |
+| `WRAPPED_LANGUAGE` | Idioma: `en` (inglés, predeterminado), `de` (alemán), `es` (español), `pt` (portugués), `fr` (francés), `it` (italiano), `nl` (neerlandés), `ru` (ruso), `zh` (chino), `ja` (japonés), `ko` (coreano) o `ar` (árabe) |
 | `NAVIDROME_USER` | Opcional: usuario por defecto solo para la API; la página lo pide al entrar |
 | `ADMIN_KEY` | Clave para importar temas `.zip` desde la web. Si está vacía, `./deploy.sh` genera una; vacía a mano = importar desactivado |
 | `PUID` / `PGID` | Usuario que puede leer esas carpetas (`ls -ln /opt/navidrome/data`) |
