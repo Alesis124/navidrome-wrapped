@@ -16,7 +16,10 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const stage = $('#stage');
 const app = $('#app') || stage;      // --glow vive en #app para que lo hereden también los paneles laterales
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const nf = new Intl.NumberFormat('es-ES');
+const LANGUAGE = document.documentElement.lang || 'es';
+const LOCALE = { en: 'en-US', de: 'de-DE', es: 'es-ES', ru: 'ru-RU' }[LANGUAGE] || 'es-ES';
+const nf = new Intl.NumberFormat(LOCALE);
+const pluralRules = new Intl.PluralRules(LOCALE);
 const FALLBACK_HUES = [330, 210, 270, 165, 20, 235];
 
 // ---------------------------------------------------------------- utilidades
@@ -83,14 +86,25 @@ function fit(el) {
   if (counter) counter.textContent = keep;
 }
 
-const plural = (n, one, many) => `${nf.format(n)} ${n === 1 ? one : many}`;
+const UNITS = {
+  en: { day: { one: 'day', other: 'days' }, hour: { one: 'hour', other: 'hours' }, minute: { one: 'minute', other: 'minutes' } },
+  de: { day: { one: 'Tag', other: 'Tage' }, hour: { one: 'Stunde', other: 'Stunden' }, minute: { one: 'Minute', other: 'Minuten' } },
+  es: { day: { one: 'día', other: 'días' }, hour: { one: 'hora', other: 'horas' }, minute: { one: 'minuto', other: 'minutos' } },
+  ru: {
+    day: { one: 'день', few: 'дня', many: 'дней', other: 'дня' },
+    hour: { one: 'час', few: 'часа', many: 'часов', other: 'часа' },
+    minute: { one: 'минута', few: 'минуты', many: 'минут', other: 'минуты' },
+  },
+};
+const plural = (n, unit) => `${nf.format(n)} ${UNITS[LANGUAGE]?.[unit]?.[pluralRules.select(n)] || UNITS.es[unit].other}`;
 function humanSpan(min) {
   if (min >= 2880) {
     const d = Math.floor(min / 1440), h = Math.round((min % 1440) / 60);
-    return h ? `${plural(d, 'día', 'días')} y ${plural(h, 'hora', 'horas')}` : plural(d, 'día', 'días');
+    const join = { en: ' and ', de: ' und ', es: ' y ', ru: ' и ' }[LANGUAGE] || ' y ';
+    return h ? `${plural(d, 'day')} ${join}${plural(h, 'hour')}` : plural(d, 'day');
   }
-  if (min >= 120) return plural(Math.round(min / 60), 'hora', 'horas');
-  return plural(Math.round(min), 'minuto', 'minutos');
+  if (min >= 120) return plural(Math.round(min / 60), 'hour');
+  return plural(Math.round(min), 'minute');
 }
 
 // ---------------------------------------------------------------- datos derivados
@@ -109,7 +123,7 @@ function hydrate(slide) {
     const elapsed = year === now.getFullYear()
       ? Math.max(1, Math.ceil((now - new Date(year, 0, 1)) / 864e5)) : ((year % 4 === 0 && year % 100) || year % 400 === 0 ? 366 : 365);
     const pct = Math.min(100, (100 * min) / (elapsed * 1440));
-    $$('[data-fx="pct"]', slide).forEach((e) => { e.textContent = pct.toLocaleString('es-ES', { maximumFractionDigits: pct < 10 ? 1 : 0 }) + ' %'; });
+    $$('[data-fx="pct"]', slide).forEach((e) => { e.textContent = pct.toLocaleString(LOCALE, { maximumFractionDigits: pct < 10 ? 1 : 0 }) + ' %'; });
     $$('[data-fx="span"]', slide).forEach((e) => { e.textContent = humanSpan(min); });
     $('.meter', slide)?.style.setProperty('--s', (pct / 100).toFixed(4));
   }

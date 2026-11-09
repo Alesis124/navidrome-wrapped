@@ -26,7 +26,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from .config import DEFAULT_THEME, THEMES_DIR
+from .config import DEFAULT_THEME, SUPPORTED_LANGUAGES, THEMES_DIR
 
 BUILTIN_DIR = Path(__file__).parent / "themes"
 
@@ -345,7 +345,7 @@ def load(theme_id: str) -> dict:
     chain.reverse()  # primero el tema base
 
     out = {"id": theme_id, "name": theme_id, "author": "", "version": "", "description": "",
-           "tokens": {}, "strings": {}, "swiper": {}, "audio": {}, "fonts": [], "css": [],
+           "tokens": {}, "strings": {}, "translations": {}, "swiper": {}, "audio": {}, "fonts": [], "css": [],
            "script": None, "slides": None, "palette": None, "templates": {}, "wide": False,
            "engine": "html", "entry": None}
     engine = None
@@ -360,6 +360,11 @@ def load(theme_id: str) -> dict:
                 out[k] = str(m[k])
         out["tokens"].update(_tokens(m.get("tokens")))
         out["strings"].update({str(k): str(v) for k, v in (m.get("strings") or {}).items()})
+        for language, strings in (m.get("translations") or {}).items():
+            if language in SUPPORTED_LANGUAGES and isinstance(strings, dict):
+                out["translations"].setdefault(language, {}).update(
+                    {str(k): str(v) for k, v in strings.items()}
+                )
         out["swiper"].update(_swiper(m.get("swiper")))
         out["audio"].update(_audio(m.get("audio")))
         out["fonts"] += [_font(tid, d, f) for f in (m.get("fonts") or [])]
@@ -506,6 +511,15 @@ def check_dir(d: Path) -> list[str]:
     for k in ("tokens", "strings", "swiper", "audio"):
         if k in m and not isinstance(m[k], dict):
             problems.append(f"«{k}» debe ser un objeto")
+    translations = m.get("translations", {})
+    if not isinstance(translations, dict):
+        problems.append("«translations» debe ser un objeto")
+    else:
+        for language, strings in translations.items():
+            if language not in SUPPORTED_LANGUAGES:
+                problems.append(f"idioma de traducción no admitido: {language!r}")
+            if not isinstance(strings, dict):
+                problems.append(f"las traducciones de {language!r} deben ser un objeto")
     try:
         for c in m.get("css") or []:
             _safe_rel(d, c, engine)

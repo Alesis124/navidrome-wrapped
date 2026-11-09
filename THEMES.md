@@ -66,7 +66,10 @@ Los ids de tema usan `a-z 0-9 - _` (por eso `2027` vale). Un tema tuyo con el id
   "swiper": { "effect": "creative", "speed": 600, "creativeEffect": { … } },    // transición
   "audio":  { "enabled": true, "fade": 0.8 },                                   // música de fondo
   "slides": [ "intro", { "type": "top-tracks", "template": "top-tracks-big", "duration": 8000, "opts": { "limit": 3 } }, "outro" ],
-  "strings": { "intro_title": "Mi {year}", "night_kicker": "Modo vampiro" }
+  "strings": { "intro_title": "Mi {year}", "night_kicker": "Modo vampiro" },
+  "translations": {
+    "en": { "intro_title": "My {year}", "night_kicker": "Vampire mode" }
+  }
 }
 ```
 
@@ -79,11 +82,13 @@ Los ids de tema usan `a-z 0-9 - _` (por eso `2027` vale). Un tema tuyo con el id
 | `swiper` | Transición. `effect`: `slide`, `fade`, `cube`, `coverflow`, `flip`, `creative`, `cards`; `speed` (100–3000 ms); `direction`; `spaceBetween` y los objetos `creativeEffect`, `cubeEffect`, `coverflowEffect`, `flipEffect`, `cardsEffect`, `fadeEffect` (ver la [documentación de Swiper](https://swiperjs.com/swiper-api#effects)). |
 | `slides` | Orden y duración (ms) de las diapositivas. Una entrada es `"tipo"` o `{type, template, duration, opts}`. Se omiten solas las que no apliquen (p. ej. «madrugada» si no hay datos). Puedes repetir un tipo con otra `template`. |
 | `strings` | Textos. Se usan en las plantillas como `{{{s.clave}}}`. |
+| `translations` | Textos alternativos por idioma (`en`, `de`, `es`, `ru`, `zh`, `ja`, `ko`, `ar`). Las claves se mezclan sobre `strings`; si falta una traducción, se usa el texto base. |
 | `audio` | `enabled: false` quita la música y oculta el botón de silencio. |
 
 **Herencia:** un tema hereda de otro (`"extends"`, hasta 4 niveles) y solo declara lo que cambia.
 `tokens`, `strings`, `swiper` y `audio` se mezclan clave a clave; `fonts` y `css` se acumulan (primero el
 padre); `slides` y `palette` se sustituyen enteros; las plantillas se sustituyen una a una por nombre.
+Las traducciones también se heredan y se mezclan por idioma.
 
 ## Tipos de diapositiva
 

@@ -12,6 +12,7 @@ from fastapi import Request
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from .config import AUTH_PASSWORD, AUTH_USER
+from .i18n import tr
 
 ENABLED = bool(AUTH_USER and AUTH_PASSWORD)
 if bool(AUTH_USER) != bool(AUTH_PASSWORD):
@@ -21,7 +22,8 @@ COOKIE = "wrapped_session"
 TTL = 30 * 24 * 3600
 KEY = hashlib.sha256(f"wrapped-session:{AUTH_USER}:{AUTH_PASSWORD}".encode()).digest()
 # Rutas que se pueden ver sin sesión: la pantalla de login y lo que necesita para pintarse
-PUBLIC = {"/login", "/login.html", "/api/login", "/api/health", "/favicon.svg", "/favicon-32.png", "/apple-touch-icon.png"}
+PUBLIC = {"/login", "/login.html", "/js/i18n.js", "/api/login", "/api/config", "/api/health",
+          "/favicon.svg", "/favicon-32.png", "/apple-touch-icon.png"}
 
 _fails: dict[str, list[float]] = {}   # ip -> instantes de los últimos fallos
 MAX_FAILS, WINDOW = 5, 300
@@ -88,7 +90,7 @@ async def middleware(request: Request, call_next):
     if path in PUBLIC or valid_token(request.cookies.get(COOKIE)):
         return await call_next(request)
     if path.startswith("/api/"):
-        return JSONResponse({"detail": "Hace falta iniciar sesión"}, status_code=401)
+        return JSONResponse({"detail": tr("login_required")}, status_code=401)
     nxt = request.url.path + (("?" + request.url.query) if request.url.query else "")
     from urllib.parse import quote
     return RedirectResponse("/login?next=" + quote(nxt, safe=""), status_code=303)

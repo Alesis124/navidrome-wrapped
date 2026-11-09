@@ -46,6 +46,10 @@ html, body { height: 100%; background: #000; color: var(--fg); overflow: hidden;
 .hud button { width: 38px; height: 38px; border: 0; border-radius: 50%; font-size: 1rem; display: grid; place-items: center; padding: 0;
   color: #fff; background: rgba(0,0,0,.35); backdrop-filter: blur(6px); cursor: pointer; }
 .hud button[hidden] { display: none; }
+.hud button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+#stage:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 #splash { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 1.5rem; text-align: center; padding: 2rem;
@@ -226,6 +230,12 @@ body.busy #loader { z-index: 10000; }
 @keyframes ph-shimmer { to { background-position: -220% 0; } }
 @keyframes col-in { from { opacity: 0; transform: translateY(28px) scale(.94); } }
 @media (prefers-reduced-motion: reduce) { .collage .ph, .collage img.in { animation: none; } }
+@keyframes reduced-fill { from { opacity: .5; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  #progress i.on::after { animation: reduced-fill var(--dur, 6s) linear forwards !important; }
+}
 
 /* Zoom con pellizco en táctil: el gesto lo gestiona el reproductor */
 @media (hover: none) { #stage { touch-action: none; } }

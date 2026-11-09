@@ -10,6 +10,10 @@ DEFAULT_YEAR = int(os.getenv("WRAPPED_YEAR") or datetime.now().year)
 CLIP_SECONDS = int(os.getenv("CLIP_SECONDS", "30"))
 SNAPSHOT_TTL = int(os.getenv("SNAPSHOT_TTL", "60"))
 DB_ACCESS = os.getenv("DB_ACCESS", "auto")  # auto | direct | snapshot
+WRAPPED_LANGUAGE = os.getenv("WRAPPED_LANGUAGE", "en").strip().lower()
+SUPPORTED_LANGUAGES = {"en", "de", "es", "ru", "zh", "ja", "ko", "ar"}
+if WRAPPED_LANGUAGE not in SUPPORTED_LANGUAGES:
+    raise RuntimeError("WRAPPED_LANGUAGE must be one of: en, de, es, ru, zh, ja, ko, ar")
 THEMES_DIR = os.getenv("THEMES_DIR", "/themes")
 DEFAULT_THEME = os.getenv("WRAPPED_THEME", "")
 ADMIN_KEY = os.getenv("ADMIN_KEY", "")   # vacío = importar temas desde la web desactivado

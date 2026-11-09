@@ -16,6 +16,7 @@ services:
       CACHE_DIR: /cache
       NAVIDROME_USER: ${NAVIDROME_USER:-}
       WRAPPED_YEAR: ${WRAPPED_YEAR:-}
+      WRAPPED_LANGUAGE: ${WRAPPED_LANGUAGE:-en}  # en | de | es | ru | zh | ja | ko | ar
       CLIP_SECONDS: ${CLIP_SECONDS:-30}
       SNAPSHOT_TTL: ${SNAPSHOT_TTL:-60}
       THEMES_DIR: /themes

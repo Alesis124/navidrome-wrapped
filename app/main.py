@@ -13,7 +13,8 @@ import mimetypes
 
 from . import audio, auth, db, queries, stats, themes
 from .version import __version__
-from .config import ADMIN_KEY, DEFAULT_USER, DEFAULT_YEAR, MAX_THEME_ZIP
+from .config import ADMIN_KEY, DEFAULT_USER, DEFAULT_YEAR, MAX_THEME_ZIP, WRAPPED_LANGUAGE
+from .i18n import tr
 
 app = FastAPI(title="Navidrome Wrapped", version=__version__)
 mimetypes.add_type("font/woff2", ".woff2")
@@ -35,7 +36,7 @@ async def login(request: Request):
     ip = auth.client_ip(request)
     wait = auth.locked(ip)
     if wait:
-        return JSONResponse({"detail": f"Demasiados intentos. Espera {wait} s."}, status_code=429)
+        return JSONResponse({"detail": tr("login_locked", seconds=wait)}, status_code=429)
     try:
         body = await request.json()
     except Exception:
@@ -43,7 +44,7 @@ async def login(request: Request):
     if not auth.check_credentials(str(body.get("user", "")), str(body.get("password", ""))):
         auth.fail(ip)
         await asyncio.sleep(0.6)
-        return JSONResponse({"detail": "Usuario o contraseña incorrectos"}, status_code=401)
+        return JSONResponse({"detail": tr("login_invalid")}, status_code=401)
     auth.clear(ip)
     resp = JSONResponse({"ok": True})
     resp.set_cookie(auth.COOKIE, auth.make_token(), max_age=auth.TTL, httponly=True, samesite="lax", secure=auth.secure(request), path="/")
@@ -81,7 +82,8 @@ def resolve_user(conn, name: str) -> str | None:
 
 @app.get("/api/config")
 def config():
-    return {"default_year": DEFAULT_YEAR, "import_enabled": bool(ADMIN_KEY), "auth_enabled": auth.ENABLED, "version": __version__}
+    return {"default_year": DEFAULT_YEAR, "import_enabled": bool(ADMIN_KEY), "auth_enabled": auth.ENABLED,
+            "language": WRAPPED_LANGUAGE, "version": __version__}
 
 
 @app.get("/api/years")
@@ -90,7 +92,7 @@ def years(user: str = Query(...)):
     with db.connect() as conn:
         name = resolve_user(conn, user)
         if not name:
-            raise HTTPException(404, f"No encuentro el usuario «{user.strip()}»")
+            raise HTTPException(404, tr("user_not_found", user=user.strip()))
         plays = stats.load_plays(conn, name) if db.detect_mode(conn) == "scrobbles" else []
         ys = sorted({p["dt"].year for p in plays}, reverse=True)
     return {"user": name, "years": ys or [DEFAULT_YEAR]}
@@ -99,11 +101,11 @@ def years(user: str = Query(...)):
 @app.get("/api/wrapped")
 def wrapped(background: BackgroundTasks, user: str = Query(DEFAULT_USER), year: int = Query(DEFAULT_YEAR)):
     if not user:
-        raise HTTPException(400, "Falta ?user= (o la variable NAVIDROME_USER)")
+        raise HTTPException(400, tr("user_required"))
     with db.connect() as conn:
         name = resolve_user(conn, user)
         if not name:
-            raise HTTPException(404, f"No encuentro el usuario «{user.strip()}»")
+            raise HTTPException(404, tr("user_not_found", user=user.strip()))
         user = name
         mode = db.detect_mode(conn)
         plays = stats.load_plays(conn, user) if mode == "scrobbles" else []
@@ -113,7 +115,7 @@ def wrapped(background: BackgroundTasks, user: str = Query(DEFAULT_USER), year: 
             mode = "annotation"
             data = stats.from_annotation(conn, user, year)
     if data is None:
-        raise HTTPException(404, f"Sin reproducciones de «{user}» en {year}")
+        raise HTTPException(404, tr("no_plays", user=user, year=year))
     result = {"user": user, "year": year, "mode": mode, **data}
     ids = list(dict.fromkeys(re.findall(r"/api/cover/([A-Za-z0-9_-]+)", json.dumps(result))))[:60]
     if ids:
@@ -140,17 +142,17 @@ async def theme_import(request: Request, force: bool = Query(False), id: str | N
     acepta con la clave ADMIN_KEY (cabecera X-Admin-Key); sin clave configurada está desactivado.
     """
     if not ADMIN_KEY:
-        raise HTTPException(403, "La importación está desactivada: define ADMIN_KEY en .env y reinicia")
+        raise HTTPException(403, tr("import_disabled"))
     if not hmac.compare_digest(request.headers.get("x-admin-key", "").encode(), ADMIN_KEY.encode()):
         await asyncio.sleep(1.5)  # frena la fuerza bruta
-        raise HTTPException(401, "Clave incorrecta")
+        raise HTTPException(401, tr("invalid_key"))
     if int(request.headers.get("content-length") or 0) > MAX_THEME_ZIP:
-        raise HTTPException(413, "El zip pesa más de 30 MB")
+        raise HTTPException(413, tr("zip_too_large"))
     raw = bytearray()
     async for chunk in request.stream():
         raw += chunk
         if len(raw) > MAX_THEME_ZIP:
-            raise HTTPException(413, "El zip pesa más de 30 MB")
+            raise HTTPException(413, tr("zip_too_large"))
     try:
         return themes.install_zip(bytes(raw), force=force, forced_id=id)
     except themes.ThemeWriteError as e:
@@ -175,7 +177,7 @@ def theme_file(theme_id: str, path: str):
     try:
         f = themes.resolve_file(theme_id, path)
     except themes.ThemeError:
-        raise HTTPException(404, "no encontrado")
+        raise HTTPException(404, tr("not_found"))
     return FileResponse(f, headers={"Cache-Control": "no-cache"})
 
 

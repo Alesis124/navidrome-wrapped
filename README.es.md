@@ -1,4 +1,6 @@
-[English 🇬🇧](README.md) | [Español 🇪🇸](README.es.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+
+> **Aviso de traducción:** Las traducciones de este proyecto se hicieron con IA y pueden contener errores.
 
 # Navidrome Wrapped
 
@@ -11,6 +13,7 @@ historias con música de fondo (clips de 30 s de tus canciones top) y exportaci�
 - **Temas:** el aspecto (barra de progreso, transiciones, fondo, tipografía, textos, orden de diapositivas) es
   un tema intercambiable que se importa como carpeta o zip. Ver [THEMES.md](THEMES.md).
 - **Bajo demanda:** no hay procesos en segundo plano; calcula al abrir la página.
+- **Accesibilidad:** pausa con teclado, foco visible y avisos de diapositiva para lectores de pantalla. No se ha realizado una auditoría formal ni se garantiza la conformidad con WCAG.
 
 ## Vista previa
 
@@ -46,6 +49,7 @@ y además deja `./themes` con el dueño `PUID:PGID` para que la web pueda instal
 
 - **Móvil:** el Wrapped ocupa toda la pantalla. Se toca a la derecha para avanzar, a la izquierda para
   retroceder y se mantiene pulsado para pausar.
+- **Controles accesibles:** enfoca la historia y usa ←/→ para navegar, o el botón Pausar/Reanudar / `P`; los cambios de diapositiva se anuncian a lectores de pantalla. Se respeta la preferencia de movimiento reducido.
 - **Ordenador** (ventana de 1000 px o más y apaisada): con cualquiera de los temas incluidos la tarjeta ocupa **toda la
   ventana** con una maquetación apaisada propia (texto a la izquierda, discos, gráficas y carátulas a la
   derecha). Atajos: ← → o espacio para moverte, `H` vuelve al inicio, `M` silencio (pasa el ratón por el altavoz para bajar el volumen), `S` guarda la tarjeta como imagen (en un ordenador pregunta si la quieres apaisada o vertical)
@@ -65,6 +69,7 @@ y además deja `./themes` con el dueño `PUID:PGID` para que la web pueda instal
 | `NAVIDROME_NETWORK` | Red Docker de Navidrome: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
 | `NAVIDROME_DATA_DIR` | Carpeta del host con `navidrome.db` (la que Navidrome monta en `/data`) |
 | `MUSIC_DIR_HOST` | Carpeta del host con la música (la misma que Navidrome monta en `/music`) |
+| `WRAPPED_LANGUAGE` | Idioma: `en` (inglés, predeterminado), `de` (alemán), `es` (español), `ru` (ruso), `zh` (chino), `ja` (japonés), `ko` (coreano) o `ar` (árabe) |
 | `NAVIDROME_USER` | Opcional: usuario por defecto solo para la API; la página lo pide al entrar |
 | `ADMIN_KEY` | Clave para importar temas `.zip` desde la web. Si está vacía, `./deploy.sh` genera una; vacía a mano = importar desactivado |
 | `PUID` / `PGID` | Usuario que puede leer esas carpetas (`ls -ln /opt/navidrome/data`) |
@@ -72,6 +77,9 @@ y además deja `./themes` con el dueño `PUID:PGID` para que la web pueda instal
 Si Navidrome guarda los datos en un **volumen con nombre** en lugar de una carpeta, cambia en
 `docker-compose.yml` la línea `${NAVIDROME_DATA_DIR}:/data:ro` por `navidrome_data:/data:ro` y declara
 el volumen como `external: true` al final del fichero.
+
+Pon el código de idioma que quieras en `WRAPPED_LANGUAGE` dentro de `.env` y ejecuta `./deploy.sh`.
+La interfaz, el login, los temas incluidos, las fechas y los números usarán ese idioma. Los temas personalizados mantienen sus textos originales salvo que incluyan traducciones para el idioma elegido.
 
 ### Dos detalles importantes
 

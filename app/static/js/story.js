@@ -4,7 +4,7 @@
 import { Bgm } from './audio.js';
 import { createCollage } from './collage.js';
 import { saveCard } from './export.js';
-import { compile, esc, fmt, interpolate, render } from './tpl.js';
+import { compile, esc, fmt, interpolate, render, setLocale } from './tpl.js';
 import { DEFAULT_SEQUENCE, SLIDES } from './slides.js';
 import { mountReactTheme } from './react-host.js';
 import { loadTheme } from './theme.js';
@@ -41,6 +41,10 @@ function preloadCovers(data) {
 
 async function main() {
   const q = new URLSearchParams(location.search);
+  const config = await fetch('/api/config').then((r) => r.json())
+    .catch(() => ({ import_enabled: false, default_year: new Date().getFullYear(), language: 'en' }));
+  const locale = window.NW_I18N.applyLanguage(config.language || 'en');
+  setLocale(config.language || 'en');
 
   let theme;
   try { theme = await loadTheme(q.get('theme'), q.get('year')); }
@@ -48,25 +52,27 @@ async function main() {
     console.error(e);
     $('#splash-title').innerHTML = '<i class="fa fa-face-frown" aria-hidden="true"></i>';
     $('#who').hidden = true;
-    $('#splash-msg').textContent = e.message;
+    $('#splash-msg').textContent = locale.ui.theme_error
+      .replace('{id}', q.get('theme') || 'default')
+      .replace('{error}', e instanceof TypeError ? locale.ui.offline : e.message);
     $('#splash').dataset.ready = '1';
     return;
   }
-  const config = await fetch('/api/config').then((r) => r.json())
-    .catch(() => ({ import_enabled: false, default_year: new Date().getFullYear() }));
+  theme.strings = { ...theme.strings, ...(theme.translations?.[config.language] || {}) };
   const chrome = initChrome({ q, theme, config });
 
   // Sin ?user= → pantalla donde se escribe el usuario y se elige el año
   let data = null, err = null;
   if (q.get('user')) {
-    try { data = await fetchWrapped(q); } catch (e) { err = e; }
+    try { data = await fetchWrapped(q); }
+    catch (e) { err = new Error(e instanceof TypeError ? locale.ui.offline : e.message); }
   }
   if (!data) { chrome.gate({ user: q.get('user') || '', message: err?.message || '' }); return; }
 
-  play(data, theme, chrome, q);
+  play(data, theme, chrome, q, locale);
 }
 
-function play(data, theme, chrome, q) {
+function play(data, theme, chrome, q, locale) {
   const isReact = theme.engine === 'react';   // «html»: plantillas + Swiper · «react»: componente propio (react-host.js)
   // ---------- Diapositivas ----------
   const compiled = {};
@@ -108,7 +114,9 @@ function play(data, theme, chrome, q) {
   if (!isReact) $('#slides').innerHTML = slides.map((s, i) =>
     `<section class="swiper-slide" data-type="${esc(s.type)}" style="--c:${palette[i % palette.length]};` +
     `${s.cover ? `--cover:url('${encodeURI(s.cover)}');--cover-blur:url('${encodeURI(s.cover)}/blur');` : ''}"><div class="card">${s.html}</div></section>`).join('');
+  if (!isReact) $('#slides').setAttribute('aria-hidden', 'true');
   $('#progress').innerHTML = slides.map(() => '<i></i>').join('');
+  const announcement = $('#slide-announcement');
   if (!isReact) document.querySelectorAll('.card').forEach((c) =>
     [...c.children].forEach((el, i) => el.style.setProperty('--i', i)));
 
@@ -130,6 +138,10 @@ function play(data, theme, chrome, q) {
   function countUp(slide) {
     slide.querySelectorAll('[data-count]').forEach((el) => {
       const end = +el.dataset.count, t0 = performance.now();
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        el.textContent = fmt(end);
+        return;
+      }
       const tick = (t) => {
         const k = Math.min(1, (t - t0) / 1200);
         el.textContent = fmt(end * (1 - (1 - k) ** 3));
@@ -148,6 +160,26 @@ function play(data, theme, chrome, q) {
     if (audioOn) bgm.play(slides[i].clip, theme.audio.fade ?? 0.8);
     if (sw.slides[i]) countUp(sw.slides[i]);
     chrome.tocActive(i);
+    const slideNames = {
+      intro: 'home', minutes: 'minutes', race: 'artists', 'top-artists': 'artists',
+      'top-tracks': 'tracks', 'number-one': 'number_one', discoveries: 'discoveries',
+      months: 'months', age: 'age', hour: 'favorite_hour', night: 'late_night',
+      loop: 'loop', repeat: 'repeat', recap: 'recap', outro: 'finale', collage: 'recap',
+    };
+    const label = locale.ui[slideNames[slides[i].type]] || slides[i].type;
+    const position = locale.html.slide_position
+      .replace('{current}', String(i + 1)).replace('{total}', String(slides.length)).replace('{label}', label);
+    announcement.textContent = position;
+    if (isReact) {
+      const root = $('#react-root');
+      root?.setAttribute('role', 'group');
+      root?.setAttribute('aria-label', position);
+    } else {
+      sw.slides.forEach((slide, k) => {
+        slide.setAttribute('aria-hidden', String(k !== i));
+        if (k === i) { slide.setAttribute('role', 'group'); slide.setAttribute('aria-label', position); }
+      });
+    }
     if (!isReact) try {
       if (prev >= 0) hooks.leave?.(sw.slides[prev], prev, slides[prev]);
       hooks.enter?.(sw.slides[i], i, slides[i]);
@@ -181,13 +213,20 @@ function play(data, theme, chrome, q) {
     bgm.setVolume(vol);
     await bgm.start();
     $('#splash').remove();
+    $('#slides').removeAttribute('aria-hidden');
     setState('playing');
     if (isReact) {
       try {
         swiper = await mountReactTheme({ theme, data, slides, vars: { year: data.year, user: data.user, next_year },
+          language: config.language || 'en',
           stage: $('#stage'), onError: (err) => console.error(`[tema ${theme.id}]`, err),
           play: (src) => { if (audioOn) bgm.play(src, theme.audio.fade ?? 0.8); } });
-      } catch (err) { console.error(err); document.body.classList.remove('busy'); chrome.fail(`No se pudo cargar el tema React «${theme.id}»: ${err.message}`); return; }
+      } catch (err) {
+        console.error(err);
+        document.body.classList.remove('busy');
+        chrome.fail(locale.ui.theme_error.replace('{id}', theme.id).replace('{error}', err.message));
+        return;
+      }
       swiper.on('slideChange', onSlide);
     } else {
       swiper = new Swiper('.swiper', { speed: 550, ...theme.swiper, allowTouchMove: false });
@@ -195,6 +234,9 @@ function play(data, theme, chrome, q) {
       try { hooks.init?.({ root: $('#stage'), data, theme, swiper, bgm, slides }); }
       catch (err) { console.warn(`[tema ${theme.id}] error en el script del tema`, err); }
     }
+    $('#pause').hidden = false;
+    updatePauseControl();
+    if (manualPaused) pauseOn();
     onSlide(swiper);
     requestAnimationFrame(() => document.body.classList.remove('busy'));
   });
@@ -211,14 +253,37 @@ function play(data, theme, chrome, q) {
   // Toque izq. = anterior, resto = siguiente, mantener = pausa
   const stage = $('#stage');
   let hold, held = false;
+  let manualPaused = false;
   // ---- Zoom con pellizco (solo táctil). Mientras hay zoom la historia queda en pausa; un toque lo quita ----
   const zs = { s: 1, x: 0, y: 0, skip: false, moved: false, sup: false };
   const pts = new Map();
   let pinch = null, pan = null;
   const zoomed = () => zs.s > 1.02;
   const zoomEl = () => (isReact ? $('#react-root') : $('.swiper'));
-  const pauseOn = () => { $('#progress').classList.add('paused'); swiper?.setPaused?.(true); };
-  const pauseOff = () => { $('#progress').classList.remove('paused'); swiper?.setPaused?.(false); };
+  const updatePauseControl = () => {
+    const button = $('#pause');
+    const paused = $('#progress').classList.contains('paused');
+    const text = paused ? locale.html.resume : locale.html.pause;
+    button.setAttribute('aria-label', text);
+    button.title = text;
+    button.innerHTML = `<i class="fa ${paused ? 'fa-play' : 'fa-pause'}" aria-hidden="true"></i>`;
+  };
+  const pauseOn = () => {
+    $('#progress').classList.add('paused');
+    swiper?.setPaused?.(true);
+    updatePauseControl();
+  };
+  const pauseOff = () => {
+    if (manualPaused) return;
+    $('#progress').classList.remove('paused');
+    swiper?.setPaused?.(false);
+    updatePauseControl();
+  };
+  $('#pause').addEventListener('click', () => {
+    manualPaused = !manualPaused;
+    if (manualPaused) { pauseOn(); bgm?.suspend(); }
+    else { pauseOff(); bgm?.resume(); }
+  });
   const applyZoom = (anim) => {
     const el = zoomEl(); if (!el) return;
     el.style.transformOrigin = '0 0';
@@ -359,9 +424,10 @@ function play(data, theme, chrome, q) {
   }
 
   addEventListener('keydown', (e) => {
-    if (!swiper || e.ctrlKey || e.metaKey || e.altKey || e.target.closest?.('input, select, textarea, dialog')) return;
+    if (!swiper || e.ctrlKey || e.metaKey || e.altKey || e.target.closest?.('input, select, textarea, button, a, dialog')) return;
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); swiper.slideNext(); }
     else if (e.key === 'ArrowLeft') swiper.slidePrev();
+    else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); $('#pause').click(); }
     else if (e.key === 'm' || e.key === 'M') mute();
     else if (e.key === 's' || e.key === 'S') save();
     else if (e.key === 'h' || e.key === 'H') goHome();

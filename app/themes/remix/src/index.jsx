@@ -1,11 +1,12 @@
 // Remix: tema React + motion. Compilar:  cd theme-kit && npm run build -- ../app/themes/remix
-import { AnimatePresence, animate, motion, useIsPresent, useMotionValue, useTransform } from 'motion/react';
+import { AnimatePresence, animate, motion, MotionConfig, useIsPresent, useMotionValue, useTransform } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 let VIEW = 'phone';   // se actualiza en cada render del tema
 const ease = [0.16, 1, 0.3, 1];
 const spring = { type: 'spring', stiffness: 210, damping: 24 };
-const nf = new Intl.NumberFormat('es-ES');
+const LOCALES = { en: 'en-US', de: 'de-DE', es: 'es-ES', ru: 'ru-RU', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR', ar: 'ar' };
+let nf = new Intl.NumberFormat(LOCALES.es);
 const num = (v) => parseInt(String(v).replace(/\D/g, ''), 10) || 0;
 const rng = (seed) => { let s = seed * 9301 + 49297; return () => ((s = (s * 16807) % 2147483647) / 2147483647); };
 
@@ -87,7 +88,7 @@ const Cover = ({ src, className, ...rest }) =>
 
 /* ─────────────── Diapositivas ─────────────── */
 
-function Intro({ data, slide, vars }) {
+function Intro({ data, slide, vars, s }) {
   const covers = useMemo(() => (data.top_tracks || []).map((t) => t.cover).filter(Boolean), []);
   const [k, setK] = useState(0);
   useEffect(() => {
@@ -107,7 +108,7 @@ function Intro({ data, slide, vars }) {
       <Spark style={{ left: '12%', top: '22%', width: '9cqmin', height: '9cqmin' }} delay={0.7} />
       <div className="rx-in">
         <motion.p className="rx-k" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.6 }}>
-          {vars.user}, tu año en música
+          {s.intro_caption}
         </motion.p>
         <Words text="Wrapped" delay={1.1} />
         <Words text={String(vars.year)} delay={1.3} />
@@ -116,27 +117,27 @@ function Intro({ data, slide, vars }) {
   );
 }
 
-function Minutes({ x, data }) {
+function Minutes({ x, data, s }) {
   const covers = (data.top_tracks || []).map((t) => t.cover);
   return (
     <>
       <Mesh colors={['#ffb000', '#ff2e00', '#00d1b2', '#ff8a00']} />
       <Scatter covers={covers} seed={3} n={5} delay={0.2} size={[15, 7]} yr={[2, 20]} />
       <div className="rx-in" style={{ marginTop: '14cqmin' }}>
-        <Words text="Este año escuchaste" className="rx-h2" delay={0.2} />
+        <Words text={s.minutes_headline} className="rx-h2" delay={0.2} />
         <Ticker to={x.minutes} delay={0.9} />
-        <Words text="minutos de música" delay={1.2} />
+        <Words text={s.minutes_unit} delay={1.2} />
         <motion.div className="rx-chips" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, ...spring }}>
-          <div className="rx-chip"><b>{x.plays}</b>reproducciones</div>
-          <div className="rx-chip"><b>{x.artists}</b>artistas</div>
-          <div className="rx-chip"><b>{x.tracks}</b>canciones</div>
+          <div className="rx-chip"><b>{x.plays}</b>{s.minutes_plays}</div>
+          <div className="rx-chip"><b>{x.artists}</b>{s.minutes_artists}</div>
+          <div className="rx-chip"><b>{x.tracks}</b>{s.minutes_tracks}</div>
         </motion.div>
       </div>
     </>
   );
 }
 
-function Artists({ x, slide }) {
+function Artists({ x, slide, s }) {
   const list = x.artists.slice(0, 5);
   const [k, setK] = useState(0);
   useEffect(() => {
@@ -146,7 +147,7 @@ function Artists({ x, slide }) {
   const a = list[k];
   return (
     <div className="rx-art">
-      <Words text={`Tus ${list.length} artistas más escuchados`} className="rx-h2" />
+      <Words text={s.artists_heading} className="rx-h2" />
       <div className="rx-band">
         <Rings fg="#f3eee2" bg="#151515" />
         <AnimatePresence initial={false} mode="popLayout">
@@ -159,7 +160,7 @@ function Artists({ x, slide }) {
       <AnimatePresence mode="wait" initial={false}>
         <motion.div key={k} className="rx-name" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           exit={{ y: -16, opacity: 0 }} transition={{ duration: 0.35, ease }}>
-          <b>{a.name}</b><small>{nf.format(a.plays)} reproducciones</small>
+          <b>{a.name}</b><small>{nf.format(a.plays)} {s.artist_plays}</small>
         </motion.div>
       </AnimatePresence>
     </div>
@@ -196,7 +197,7 @@ function scoreAt(r, n, t, sq) {
   return t * (1 - 0.012 * r) + bonus;
 }
 
-function Race({ x, slide, paused, play }) {
+function Race({ x, slide, paused, play, s }) {
   const present = useIsPresent();
   const box = useRef(null), bg = useRef(null), { w: W, h: H } = useBox(box);
   const els = useRef([]), clock = useRef({ t: 0, off: 0, done: false, lead: -1 });
@@ -245,7 +246,7 @@ function Race({ x, slide, paused, play }) {
   const shown = done ? 0 : lead;
   return (
     <div className="rx-race">
-      <Words text="La carrera del año" className="rx-k" tag="p" />
+      <Words text={s.race_heading} className="rx-k" tag="p" />
       <div className="rx-field" ref={box}>
         <div className="rx-speed" ref={bg} aria-hidden="true" />
         {order.map((r, col) => {
@@ -268,12 +269,12 @@ function Race({ x, slide, paused, play }) {
         <AnimatePresence mode="wait" initial={false}>
           {done ? (
             <motion.div key="end" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ ...spring, delay: 0.3 }}>
-              <Words text={`${x.winner_name} ganó el año`} className="rx-h2 left" delay={0.4} />
-              <p className="rx-p">{x.winner_plays} reproducciones</p>
+              <Words text={s.race_winner} className="rx-h2 left" delay={0.4} />
+              <p className="rx-p">{x.winner_plays} {s.plays}</p>
             </motion.div>
           ) : (
             <motion.p key={shown} className="rx-p" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}>{x.artists[shown].name} va en cabeza</motion.p>
+              transition={{ duration: 0.25 }}>{s.race_leading.replace('{artist}', x.artists[shown].name)}</motion.p>
           )}
         </AnimatePresence>
       </div>
@@ -281,10 +282,10 @@ function Race({ x, slide, paused, play }) {
   );
 }
 
-function Tracks({ x }) {
+function Tracks({ x, s }) {
   return (
     <div className="rx-in">
-      <Words text="Tus canciones del año" className="rx-h" />
+      <Words text={s.tracks_heading} className="rx-h" />
       {x.tracks.map((t, i) => (
         <motion.div key={t.title + i} className="rx-row" initial={{ x: i % 2 ? '60cqw' : '-60cqw', opacity: 0 }}
           animate={{ x: 0, opacity: 1 }} transition={{ ...spring, delay: 0.35 + i * 0.11 }}>
@@ -298,42 +299,42 @@ function Tracks({ x }) {
   );
 }
 
-function One({ x, slide }) {
+function One({ x, slide, s }) {
   return (
     <>
       <div className="rx-cv" style={{ backgroundImage: `url('${encodeURI(slide.cover || '')}/blur')` }} />
       <div className="rx-in">
-        <Words text="Tu canción número uno" className="rx-k" tag="p" />
+        <Words text={s.one_heading} className="rx-k" tag="p" />
         <Cover src={slide.cover} className="rx-big-cover" initial={{ scale: 2.2, rotate: -8, opacity: 0 }}
           animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ duration: 1.1, ease }} />
         <Words text={x.track_title} delay={0.6} className="rx-h" />
         <motion.p className="rx-p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }}>
-          {x.track_artist} · {x.track_plays} reproducciones
+          {x.track_artist} · {x.track_plays} {s.plays}
         </motion.p>
       </div>
     </>
   );
 }
 
-function Discoveries({ x, data }) {
+function Discoveries({ x, data, s }) {
   const covers = (data.discoveries?.top_new_tracks || []).map((t) => t.cover);
   return (
     <>
       <Mesh colors={['#ff4fd8', '#2b6bff', '#8a2bff', '#00e0ff']} />
       <Scatter covers={covers} seed={7} n={6} delay={0.3} size={[14, 7]} yr={[2, 20]} />
       <div className="rx-in" style={{ marginTop: '12cqmin' }}>
-        <Words text="Este año descubriste" className="rx-h2" />
+        <Words text={s.discoveries_heading} className="rx-h2" />
         <Ticker to={x.new_tracks} delay={0.8} />
-        <Words text="canciones nuevas" delay={1.1} />
+        <Words text={s.discoveries_unit} delay={1.1} />
         <motion.p className="rx-p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.7 }}>
-          de {x.new_artists} artistas que no habías escuchado antes.
+          {s.discoveries_detail}
         </motion.p>
       </div>
     </>
   );
 }
 
-function Night({ x }) {
+function Night({ x, s }) {
   const stars = useMemo(() => { const r = rng(5); return Array.from({ length: 26 }, () => ({ x: r() * 100, y: r() * 100, s: 0.4 + r() * 1.1, d: r() * 3 })); }, []);
   return (
     <>
@@ -345,20 +346,20 @@ function Night({ x }) {
         background: 'radial-gradient(circle at 35% 35%, #fff6cf, #ffd45e 60%, #e6a93a)', boxShadow: '0 0 12cqmin rgba(255,212,94,.45)' }}
         initial={{ y: '-30cqmin', scale: 0.6, opacity: 0 }} animate={{ y: 0, scale: 1, opacity: 1 }} transition={{ duration: 1.4, ease }} />
       <div className="rx-in" style={{ marginTop: '24cqmin' }}>
-        <Words text="De madrugada" className="rx-k" tag="p" />
-        <Words text={`${x.night_plays} reproducciones tras la medianoche`} className="rx-h" delay={0.2} />
+        <Words text={s.night_heading} className="rx-k" tag="p" />
+        <Words text={s.night_headline} className="rx-h" delay={0.2} />
         <motion.p className="rx-p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>
-          Lo que más sonó: {x.night_top}. La última, a las {x.night_time}.
+          {s.night_detail}
         </motion.p>
       </div>
     </>
   );
 }
 
-function Hour({ x }) {
+function Hour({ x, s }) {
   return (
     <div className="rx-in">
-      <Words text="Tu hora favorita" className="rx-k" tag="p" />
+      <Words text={s.hour_heading} className="rx-k" tag="p" />
       <svg className="rx-clock" viewBox="-50 -50 100 100" aria-hidden="true">
         {x.hist.map((b, i) => {
           const a = (i / 24) * Math.PI * 2 - Math.PI / 2, r0 = 24, r1 = 24 + Math.max(b.pct, 4) * 0.2;
@@ -369,15 +370,15 @@ function Hour({ x }) {
         })}
         <text x="0" y="6" textAnchor="middle" fontSize="16" fontWeight="800" fill="currentColor">{x.peak}:00</text>
       </svg>
-      <Words text={`Y tu día fuerte: el ${x.peak_day}`} className="rx-h2" delay={1.2} />
+      <Words text={s.hour_detail} className="rx-h2" delay={1.2} />
     </div>
   );
 }
 
-function Months({ x }) {
+function Months({ x, s }) {
   return (
     <div className="rx-in">
-      <Words text="Tu mes con más música" className="rx-k" tag="p" />
+      <Words text={s.months_heading} className="rx-k" tag="p" />
       <Words text={x.peak_month_cap} className="rx-h" delay={0.15} />
       <div className="rx-cols">
         {x.bars.map((b, i) => (
@@ -388,18 +389,18 @@ function Months({ x }) {
           </div>
         ))}
       </div>
-      <motion.p className="rx-p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>{x.peak_plays} reproducciones ese mes.</motion.p>
+      <motion.p className="rx-p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }}>{s.months_detail}</motion.p>
     </div>
   );
 }
 
-function Age({ x }) {
+function Age({ x, s }) {
   return (
     <div className="rx-in">
-      <Words text="Según lo que escuchas, tienes" className="rx-k" tag="p" />
+      <Words text={s.age_heading} className="rx-k" tag="p" />
       <motion.div className="rx-agenum" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
         transition={{ ...spring, delay: 0.3 }}>{x.age}</motion.div>
-      <Words text="años de oído" className="rx-h" delay={0.5} />
+      <Words text={s.age_unit} className="rx-h" delay={0.5} />
       <div className="rx-decs">
         {x.decades.map((d, i) => (
           <div key={i} className={d.peak ? 'pk' : ''}>
@@ -410,23 +411,23 @@ function Age({ x }) {
         ))}
       </div>
       <motion.p className="rx-p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.6 }}>
-        Tu música gira en torno a {x.median_year}.
+        {s.age_detail}
       </motion.p>
       <motion.p className="rx-fine" initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} transition={{ delay: 1.9 }}>
-        Estimación para pasar el rato: no es ciencia.
+        {s.age_note}
       </motion.p>
     </div>
   );
 }
 
-function Outro({ data, vars }) {
+function Outro({ data, vars, s }) {
   const covers = [...(data.top_tracks || []), ...(data.top_artists || [])].map((t) => t.cover);
   return (
     <>
       <Scatter covers={covers} seed={11} n={9} delay={0.1} size={[15, 10]} yr={[2, 46]} />
       <div className="rx-in" style={{ background: 'linear-gradient(0deg, #151515 35%, transparent)', paddingTop: '30cqmin', marginTop: 'auto' }}>
-        <Words text="Hasta el año que viene" delay={0.9} />
-        <motion.p className="rx-p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>Nos vemos en {vars.next_year}.</motion.p>
+        <Words text={s.outro_heading} delay={0.9} />
+        <motion.p className="rx-p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }}>{s.outro_detail}</motion.p>
       </div>
     </>
   );
@@ -442,16 +443,19 @@ const card = {
   exit: { zIndex: 1, transition: { duration: 0.85 } },
 };
 
-export default function Theme({ data, slides, index, vars, view, paused, play }) {
+export default function Theme({ data, slides, index, vars, view, paused, play, language }) {
+  nf = new Intl.NumberFormat(LOCALES[language] || LOCALES.es);
   VIEW = view;
   const slide = slides[index];
   const View = VIEWS[slide.type];
   return (
-    <AnimatePresence initial={false}>
-      <motion.div key={index} className={`rx rx-${slide.type}${slide.type === 'intro' ? ' rx-intro' : ''}`} data-card="active"
-        variants={card} initial="enter" animate="center" exit="exit" style={{ zIndex: 2 }}>
-        {View ? <View data={data} slide={slide} x={slide.x} vars={vars} paused={paused} play={play} /> : <div className="rx-in"><Words text={slide.type} /></div>}
-      </motion.div>
-    </AnimatePresence>
+    <MotionConfig reducedMotion="user">
+      <AnimatePresence initial={false}>
+        <motion.div key={index} className={`rx rx-${slide.type}${slide.type === 'intro' ? ' rx-intro' : ''}`} data-card="active"
+          variants={card} initial="enter" animate="center" exit="exit" style={{ zIndex: 2 }}>
+          {View ? <View data={data} slide={slide} x={slide.x} vars={vars} s={slide.s} paused={paused} play={play} /> : <div className="rx-in"><Words text={slide.type} /></div>}
+        </motion.div>
+      </AnimatePresence>
+    </MotionConfig>
   );
 }

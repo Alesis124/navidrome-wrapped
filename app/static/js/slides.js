@@ -6,10 +6,9 @@
 //     clip  : URL del audio de fondo de la diapositiva
 //     cover : URL de la carátula (en CSS: var(--cover) y var(--cover-blur))
 //     x     : datos extra para la plantilla ({{x.…}}) y para los textos del tema ({clave})
-import { dayLabel, fmt } from './tpl.js';
+import { dayLabel, fmt, fmt1, getLocale } from './tpl.js';
 
 const pad2 = (n) => String(n).padStart(2, '0');
-const nf1 = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
 const pct = (v, max) => Math.round(((v || 0) / (max || 1)) * 1000) / 10;
 const top = (d) => d.top_tracks?.[0];
 const mk = (t, x = {}) => ({ clip: t?.clip, cover: t?.cover, x });
@@ -20,11 +19,10 @@ const withPct = (list) => {
   return list.map((i) => ({ ...i, pct: pct(i.plays, max) }));
 };
 
-const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto',
-  'septiembre', 'octubre', 'noviembre', 'diciembre'];
-const MONTH_INITIAL = ['E', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
-const WEEKDAYS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
-const WEEK_INITIAL = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+const monthNames = () => Array.from({ length: 12 }, (_, i) =>
+  new Date(2024, i, 1).toLocaleDateString(getLocale(), { month: 'long' }));
+const weekdayNames = () => Array.from({ length: 7 }, (_, i) =>
+  new Date(2024, 0, i + 1).toLocaleDateString(getLocale(), { weekday: 'long' }));
 
 export const SLIDES = {
   intro: { dur: 5000, build: (d) => mk(top(d), { track: top(d) }) },
@@ -66,7 +64,7 @@ export const SLIDES = {
       const max = Math.max(...a.map((r) => r.cumulative.at(-1)), 1);
       const artists = a.map((r) => ({ ...r, frac: r.cumulative.map((v) => v / max) }));
       const win = artists.reduce((best, r) => (r.plays > best.plays ? r : best), artists[0]);
-      return { ...mk(win, { artists, months: MONTHS.map(cap), max, winner: win, winner_name: win.name, winner_plays: fmt(win.plays) }), clip: undefined };   // la música la pone el propio tema según quién vaya ganando
+      return { ...mk(win, { artists, months: monthNames().map(cap), max, winner: win, winner_name: win.name, winner_plays: fmt(win.plays) }), clip: undefined };   // la música la pone el propio tema según quién vaya ganando
     },
   },
 
@@ -141,8 +139,8 @@ export const SLIDES = {
       return mk(d.top_tracks?.[1] ?? top(d), {
         peak: pad2(f.peak_hour),
         hist: f.hours.map((h, i) => ({ h: i, plays: h, pct: pct(h, max), peak: i === f.peak_hour })),
-        week: f.weekdays.map((v, i) => ({ d: WEEK_INITIAL[i], plays: v, pct: pct(v, wmax), peak: i === wi })),
-        peak_day: WEEKDAYS[wi],
+        week: f.weekdays.map((v, i) => ({ d: weekdayNames()[i][0].toLocaleUpperCase(), plays: v, pct: pct(v, wmax), peak: i === wi })),
+        peak_day: weekdayNames()[wi],
         busiest_day: dayLabel(f.busiest_day.day), busiest_plays: f.busiest_day.plays,
         busiest_minutes: f.busiest_day.minutes, streak: f.streak_days,
       });
@@ -157,8 +155,8 @@ export const SLIDES = {
       if (!m || !m.some((v) => v > 0)) return null;
       const max = Math.max(...m), pi = m.indexOf(max);
       return mk(d.top_tracks?.[2] ?? top(d), {
-        bars: m.map((v, i) => ({ m: MONTH_INITIAL[i], plays: v, pct: pct(v, max), peak: i === pi })),
-        peak_month: MONTHS[pi], peak_month_cap: cap(MONTHS[pi]), peak_plays: fmt(max),
+        bars: m.map((v, i) => ({ m: monthNames()[i][0].toLocaleUpperCase(), plays: v, pct: pct(v, max), peak: i === pi })),
+        peak_month: monthNames()[pi], peak_month_cap: cap(monthNames()[pi]), peak_plays: fmt(max),
       });
     },
   },
@@ -174,7 +172,7 @@ export const SLIDES = {
         age: a.estimate, median_year: a.median_year, decade: a.decade, decade_share: nf1.format(a.decade_share),
         coverage: a.coverage, oldest_title: a.oldest?.title, oldest_artist: a.oldest?.artist, oldest_year: a.oldest?.year,
         newest_title: a.newest?.title, newest_artist: a.newest?.artist, newest_year: a.newest?.year,
-        decades: a.decades.map((e) => ({ label: `${e.decade}s`, pct: pct(e.pct, max), share: nf1.format(e.pct), peak: e.decade === a.decade })),
+        decades: a.decades.map((e) => ({ label: `${e.decade}s`, pct: pct(e.pct, max), share: fmt1(e.pct), peak: e.decade === a.decade })),
       });
     },
   },

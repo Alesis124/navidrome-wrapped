@@ -9,15 +9,16 @@ const store = {
 };
 
 export const setState = (s) => { document.body.dataset.state = s; };
-
-// Nombre de cada diapositiva en el índice de escritorio (el tema puede cambiarlo con strings.nav_<tipo>)
-const NAV = {
-  intro: 'Inicio', minutes: 'Minutos', 'top-artists': 'Artistas', 'top-tracks': 'Canciones',
-  'number-one': 'Tu nº 1', discoveries: 'Descubrimientos', months: 'Meses', age: 'Tu edad', hour: 'Hora favorita',
-  night: 'Madrugada', loop: 'Bucle', repeat: 'En repetición', recap: 'Resumen', outro: 'Final',
+const NAV_KEYS = {
+  intro: 'home', minutes: 'minutes', 'top-artists': 'artists', 'top-tracks': 'tracks',
+  'number-one': 'number_one', discoveries: 'discoveries', months: 'months', age: 'age',
+  hour: 'favorite_hour', night: 'late_night', loop: 'loop', repeat: 'repeat',
+  recap: 'recap', outro: 'finale', collage: 'recap', race: 'artists',
 };
 
 export function initChrome({ q, theme, config }) {
+  const locale = window.NW_I18N.applyLanguage(config.language || 'en');
+  const t = locale.ui;
   const s = theme.strings || {};
   const who = $('#who'), userIn = $('#user'), yearSel = $('#year'), go = $('#go');
   const msg = $('#splash-msg'), title = $('#splash-title');
@@ -71,7 +72,7 @@ export function initChrome({ q, theme, config }) {
   imp.onclick = () => {
     $('#imp-key').value = store.get('wrapped.key', 'sessionStorage') || '';
     for (const el of $('#imp-form').elements) if (el.id !== 'imp-close') el.disabled = !config.import_enabled;
-    impMsg(config.import_enabled ? '' : 'La importación está desactivada. Ejecuta ./deploy.sh en el servidor: crea la clave (ADMIN_KEY) en el .env si no existe, y vuelve a abrir esta página.', !config.import_enabled);
+    impMsg(config.import_enabled ? '' : t.import_disabled, !config.import_enabled);
     dlg.showModal();
   };
   $('#imp-close').onclick = () => dlg.close();
@@ -82,7 +83,7 @@ export function initChrome({ q, theme, config }) {
     if (!file) return;
     const btn = $('#imp-go');
     btn.disabled = true;
-    impMsg('Subiendo…');
+    impMsg(t.uploading);
     try {
       const r = await fetch(`/api/themes/import?force=${$('#imp-force').checked}`, {
         method: 'POST', body: file, headers: { 'Content-Type': 'application/zip', 'X-Admin-Key': key },
@@ -93,13 +94,13 @@ export function initChrome({ q, theme, config }) {
       const u = new URL(location.href);
       u.searchParams.set('theme', j.id);
       const a = document.createElement('a');
-      a.href = u; a.textContent = 'Usarlo ahora';
+      a.href = u; a.textContent = t.use_now;
       const span = document.createElement('span');
-      span.textContent = `Tema «${j.id}» instalado. ` + (j.warnings?.length ? `(${j.warnings.join('; ')}) ` : '');
+      span.textContent = t.installed.replace('{id}', j.id) + ` ` + (j.warnings?.length ? `(${j.warnings.join('; ')}) ` : '');
       $('#imp-msg').classList.remove('err');
       $('#imp-msg').replaceChildren(span, a);
       $('#imp-form').reset();
-    } catch (err) { impMsg(err.message, true); }
+    } catch (err) { impMsg(err instanceof TypeError ? t.offline : err.message, true); }
     btn.disabled = false;
   };
 
@@ -109,7 +110,7 @@ export function initChrome({ q, theme, config }) {
     const my = ++seq;
     resolved = null;
     go.disabled = true;
-    if (!name) { yearSel.innerHTML = ''; yearSel.disabled = true; say(s.gate_hint ?? 'Escribe tu usuario de Navidrome y elige el año.'); return; }
+    if (!name) { yearSel.innerHTML = ''; yearSel.disabled = true; say(s.gate_hint ?? t.enter_username); return; }
     try {
       const r = await fetch('/api/years?user=' + encodeURIComponent(name));
       const j = await r.json().catch(() => ({}));
@@ -121,11 +122,11 @@ export function initChrome({ q, theme, config }) {
       yearSel.disabled = false;
       resolved = j.user;
       go.disabled = false;
-      say(`Hola, ${j.user}.`);
+      say(t.greeting.replace('{user}', j.user));
     } catch (e) {
       if (my !== seq) return;
       yearSel.innerHTML = ''; yearSel.disabled = true;
-      say(e.message, true);
+      say(e instanceof TypeError ? t.offline : e.message, true);
     }
   }
   userIn.addEventListener('input', () => { clearTimeout(timer); go.disabled = true; timer = setTimeout(check, 350); });
@@ -136,12 +137,12 @@ export function initChrome({ q, theme, config }) {
   function gate({ user = '', message = '' } = {}) {
     setState('gate');
     who.dataset.mode = 'gate';
-    title.innerHTML = s.gate_title ?? '¿Quién <br>escucha?';
-    go.textContent = s.gate_button ?? 'Ver mi Wrapped';
+    title.innerHTML = s.gate_title ?? t.gate_title;
+    go.textContent = s.gate_button ?? t.gate_button;
     userIn.value = user || remembered();
     $('#splash').dataset.ready = '1';
     $('#who-sum').textContent = '';
-    if (message) say(message, true); else say(s.gate_hint ?? 'Escribe tu usuario de Navidrome y elige el año.');
+    if (message) say(message, true); else say(s.gate_hint ?? t.enter_username);
     if (userIn.value.trim()) {
       const keep = message;
       check().then(() => { if (keep && !resolved) say(keep, true); });
@@ -168,8 +169,8 @@ export function initChrome({ q, theme, config }) {
     who.dataset.mode = 'ready';
     go.disabled = false;
     remember(data.user);
-    title.innerHTML = interpolate(s.splash_title ?? 'Tu Wrapped', vars);
-    go.textContent = interpolate(s.splash_button ?? 'Empezar', vars, false);
+    title.innerHTML = interpolate(s.splash_title ?? t.splash_title, vars);
+    go.textContent = interpolate(s.splash_button ?? t.splash_button, vars, false);
     say('');
     $('#splash').dataset.ready = '1';
     $('#who-sum').innerHTML = `<b>${esc(data.user)}</b><span>${data.year}</span>`;
@@ -188,7 +189,8 @@ export function initChrome({ q, theme, config }) {
   function toc(slides, onPick) {
     const nav = $('#toc');
     nav.innerHTML = slides.map((sl, i) => {
-      const label = s['nav_' + sl.type.replace(/-/g, '_')] ?? NAV[sl.type] ?? sl.type;
+      const key = sl.type.replace(/-/g, '_');
+      const label = s['nav_' + key] ?? t[NAV_KEYS[sl.type]] ?? sl.type;
       return `<button type="button" data-i="${i}"><span class="n">${String(i + 1).padStart(2, '0')}</span>${esc(label)}</button>`;
     }).join('');
     nav.onclick = (e) => {

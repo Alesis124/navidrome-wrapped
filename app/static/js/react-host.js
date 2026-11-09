@@ -14,7 +14,7 @@
 // (S) los sigue poniendo el motor; el tema solo dibuja. Marca la tarjeta visible con
 // data-card="active" (o class="card") para que la descarga a PNG sepa qué capturar.
 
-export async function mountReactTheme({ theme, data, slides, vars, stage, onError, play }) {
+export async function mountReactTheme({ theme, data, slides, vars, language, stage, onError, play }) {
   const [React, { createRoot }, mod] = await Promise.all([
     import('react'), import('react-dom/client'), import(theme.entry),
   ]);
@@ -75,7 +75,7 @@ export async function mountReactTheme({ theme, data, slides, vars, stage, onErro
     root.render(React.createElement(Boundary, null, React.createElement(Theme, {
       data, slides, index: state.i, direction: state.dir, count: slides.length, paused: state.paused,
       next: () => nav.slideNext(), prev: () => nav.slidePrev(), goTo: (i) => nav.slideTo(i),
-      view: view(), vars, strings, theme: info, asset, play,
+      view: view(), vars, language, strings, theme: info, asset, play,
     })));
   }
   addEventListener('wrapped:view', render);

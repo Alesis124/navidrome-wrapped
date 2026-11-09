@@ -8,13 +8,22 @@
 //
 // Dentro de #each se pueden seguir usando los datos de fuera ({{year}}, {{s.x}}…).
 
-const nf = new Intl.NumberFormat('es-ES');
+const LOCALES = { en: 'en-US', de: 'de-DE', es: 'es-ES', ru: 'ru-RU' };
+let locale = 'es-ES';
+let nf = new Intl.NumberFormat(locale);
+
+export function setLocale(language) {
+  locale = LOCALES[language] || LOCALES.es;
+  nf = new Intl.NumberFormat(locale);
+}
+export const getLocale = () => locale;
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g,
   (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export const fmt = (n) => nf.format(Math.round(+n || 0));
+export const fmt1 = (n) => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(n);
 export const dayLabel = (iso) =>
-  new Date(iso + 'T12:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+  new Date(iso + 'T12:00').toLocaleDateString(locale, { day: 'numeric', month: 'long' });
 
 export const filters = {
   num: fmt,

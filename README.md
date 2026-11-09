@@ -1,4 +1,6 @@
-[English 🇬🇧](README.md) | [Español 🇪🇸](README.es.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+
+> **Translation notice:** Translations in this project were made with AI and may contain errors.
 
 # Navidrome Wrapped
 
@@ -8,6 +10,7 @@ An annual Wrapped-style recap for Navidrome: top artists and tracks, listening m
 - **Frontend:** HTML/CSS/JS + Swiper, with no build step or CDN (all assets are in `app/static/vendor`).
 - **Themes:** The appearance (progress bar, transitions, background, typography, text, and slide order) is an interchangeable theme that can be imported as a folder or ZIP. See [THEMES.md](THEMES.md).
 - **On demand:** No background jobs; stats are calculated when you open the page.
+- **Accessibility:** Keyboard-operable pause, visible focus, and slide announcements for screen readers. Accessibility has not been formally audited and does not guarantee WCAG conformance.
 
 ## Preview
 
@@ -42,6 +45,7 @@ It also sets `./themes` to owner `PUID:PGID` so the web app can install imported
 ### Usage
 
 - **Mobile:** The Wrapped fills the screen. Tap the right side to advance, the left side to go back, or press and hold to pause.
+- **Accessible controls:** Focus the story area and use ←/→ to navigate, or use the Pause/Resume button / `P`; slide changes are announced to screen readers. The interface respects reduced-motion preferences.
 - **Desktop** (landscape window at least 1000 px wide): With any included theme, the card fills the **entire window** using a dedicated landscape layout (text on the left, records, charts, and covers on the right). Shortcuts: ← → or Space to navigate, `H` to return to the start, `M` to mute (hover over the speaker to adjust volume), and `S` to save the card as an image (on desktop, choose landscape or portrait; wide view exports in landscape). The view is selected automatically: landscape on desktop, 9:16 on mobile or in a narrow window. You can also jump to a slide by clicking its segment in the progress bar. Classic and Neon also have a wide layout; themes without a landscape layout always use the 9:16 frame.
 - **When opening the page,** each person enters their Navidrome username (case-insensitive; the page remembers the last one) and selects a year with listening history. Other users are not listed. Direct links still work: `/?user=Alesis&year=2026`.
 - **Import themes:** Use the “Import theme (.zip)” button on the start screen. It asks for the `ADMIN_KEY`; `./deploy.sh` generates one in `.env` on first run and displays it.
@@ -53,12 +57,16 @@ It also sets `./themes` to owner `PUID:PGID` so the web app can install imported
 | `NAVIDROME_NETWORK` | Navidrome's Docker network: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
 | `NAVIDROME_DATA_DIR` | Host directory containing `navidrome.db` (the one Navidrome mounts at `/data`) |
 | `MUSIC_DIR_HOST` | Host directory containing the music (the same one Navidrome mounts at `/music`) |
+| `WRAPPED_LANGUAGE` | Interface language: `en` (default), `de`, `es`, `ru`, `zh`, `ja`, `ko`, or `ar` |
 | `NAVIDROME_USER` | Optional default user for the API only; the page asks for a user when opened |
 | `ADMIN_KEY` | Key for importing `.zip` themes from the web. If empty, `./deploy.sh` generates one; if left empty manually, importing is disabled |
 | `PUID` / `PGID` | User allowed to read those directories (`ls -ln /opt/navidrome/data`) |
 
 If Navidrome stores its data in a **named volume** instead of a directory, change
 `${NAVIDROME_DATA_DIR}:/data:ro` in `docker-compose.yml` to `navidrome_data:/data:ro` and declare the volume as `external: true` at the end of the file.
+
+Set `WRAPPED_LANGUAGE` in `.env` to the desired language code, then run `./deploy.sh` to apply it.
+The interface, login screen, built-in themes, dates, and numbers use the selected language. Custom themes use their default text unless they include a translation for that language.
 
 ### Two important details
 

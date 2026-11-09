@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+  <script src="js/i18n.js"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Navidrome Wrapped</title>
@@ -101,17 +102,22 @@
   <form id="f" autocomplete="on">
     <img src="favicon.svg" alt="">
     <h1>Navidrome Wrapped</h1>
-    <p>Inicia sesión para ver tu resumen.</p>
-    <label>Usuario <input id="u" name="username" autocomplete="username" autocapitalize="none" required
+    <p data-i18n="login_intro">Inicia sesión para ver tu resumen.</p>
+    <label><span data-i18n="login_user">Usuario</span> <input id="u" name="username" autocomplete="username" autocapitalize="none" required
         autofocus></label>
-    <label>Contraseña <input id="p" name="password" type="password" autocomplete="current-password" required></label>
-    <button id="go" type="submit">Entrar</button>
+    <label><span data-i18n="login_password">Contraseña</span> <input id="p" name="password" type="password" autocomplete="current-password" required></label>
+    <button id="go" type="submit" data-i18n="login_submit">Entrar</button>
     <p id="msg" role="alert"></p>
   </form>
   <script>
     const f = document.getElementById('f'),
       msg = document.getElementById('msg'),
       go = document.getElementById('go');
+    let language = 'es';
+    fetch('/api/config').then((r) => r.json()).then((config) => {
+      language = config.language || 'es';
+      window.NW_I18N.applyLanguage(language);
+    }).catch(() => {});
     f.addEventListener('submit', async (e) => {
       e.preventDefault();
       go.disabled = true;
@@ -132,9 +138,9 @@
           location.replace(n.startsWith('/') && !n.startsWith('//') ? n : '/');
           return;
         }
-        msg.textContent = (await r.json().catch(() => ({}))).detail || 'No se pudo iniciar sesión';
+        msg.textContent = (await r.json().catch(() => ({}))).detail || window.NW_I18N.messages[language].login.failed;
       } catch {
-        msg.textContent = 'No hay conexión con el servidor';
+        msg.textContent = window.NW_I18N.messages[language].login.offline;
       }
       go.disabled = false;
       f.p.select();
