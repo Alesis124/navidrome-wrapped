@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 let VIEW = 'phone';   // se actualiza en cada render del tema
 const ease = [0.16, 1, 0.3, 1];
 const spring = { type: 'spring', stiffness: 210, damping: 24 };
-const LOCALES = { en: 'en-US', de: 'de-DE', es: 'es-ES', ru: 'ru-RU', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR', ar: 'ar' };
+const LOCALES = { en: 'en-US', de: 'de-DE', es: 'es-ES', pt: 'pt-BR', fr: 'fr-FR', ru: 'ru-RU', zh: 'zh-CN', ja: 'ja-JP', ko: 'ko-KR', ar: 'ar' };
 let nf = new Intl.NumberFormat(LOCALES.es);
 const num = (v) => parseInt(String(v).replace(/\D/g, ''), 10) || 0;
 const rng = (seed) => { let s = seed * 9301 + 49297; return () => ((s = (s * 16807) % 2147483647) / 2147483647); };

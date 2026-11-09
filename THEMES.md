@@ -82,7 +82,7 @@ Los ids de tema usan `a-z 0-9 - _` (por eso `2027` vale). Un tema tuyo con el id
 | `swiper` | Transición. `effect`: `slide`, `fade`, `cube`, `coverflow`, `flip`, `creative`, `cards`; `speed` (100–3000 ms); `direction`; `spaceBetween` y los objetos `creativeEffect`, `cubeEffect`, `coverflowEffect`, `flipEffect`, `cardsEffect`, `fadeEffect` (ver la [documentación de Swiper](https://swiperjs.com/swiper-api#effects)). |
 | `slides` | Orden y duración (ms) de las diapositivas. Una entrada es `"tipo"` o `{type, template, duration, opts}`. Se omiten solas las que no apliquen (p. ej. «madrugada» si no hay datos). Puedes repetir un tipo con otra `template`. |
 | `strings` | Textos. Se usan en las plantillas como `{{{s.clave}}}`. |
-| `translations` | Textos alternativos por idioma (`en`, `de`, `es`, `ru`, `zh`, `ja`, `ko`, `ar`). Las claves se mezclan sobre `strings`; si falta una traducción, se usa el texto base. |
+| `translations` | Textos alternativos por idioma (`en`, `de`, `es`, `pt`, `fr`, `ru`, `zh`, `ja`, `ko`, `ar`). Las claves se mezclan sobre `strings`; si falta una traducción, se usa el texto base. |
 | `audio` | `enabled: false` quita la música y oculta el botón de silencio. |
 
 **Herencia:** un tema hereda de otro (`"extends"`, hasta 4 niveles) y solo declara lo que cambia.

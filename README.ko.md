@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **번역 안내:** 이 프로젝트의 번역은 AI로 작성되어 오류가 있을 수 있습니다.
 
@@ -37,7 +37,7 @@ cp .env.example .env
 | `NAVIDROME_NETWORK` | Navidrome의 Docker 네트워크 |
 | `NAVIDROME_DATA_DIR` | `navidrome.db`가 있는 호스트 디렉터리 |
 | `MUSIC_DIR_HOST` | 음악 파일이 있는 호스트 디렉터리 |
-| `WRAPPED_LANGUAGE` | `en`(기본값), `de`, `es`, `ru`, `zh`, `ja`, `ko`, `ar` |
+| `WRAPPED_LANGUAGE` | `en`(기본값), `de`, `es`, `pt`, `fr`, `ru`, `zh`, `ja`, `ko`, `ar` |
 | `ADMIN_KEY` | ZIP 테마 가져오기 키 |
 | `PUID` / `PGID` | 디렉터리를 읽을 수 있는 사용자/그룹 ID |
 

@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **翻译说明：** 本项目中的翻译由 AI 完成，可能存在错误。
 
@@ -37,7 +37,7 @@ cp .env.example .env
 | `NAVIDROME_NETWORK` | Navidrome 的 Docker 网络 |
 | `NAVIDROME_DATA_DIR` | 存放 `navidrome.db` 的主机目录 |
 | `MUSIC_DIR_HOST` | 存放音乐的主机目录 |
-| `WRAPPED_LANGUAGE` | `en`（默认）、`de`、`es`、`ru`、`zh`、`ja`、`ko` 或 `ar` |
+| `WRAPPED_LANGUAGE` | `en`（默认）、`de`、`es`、`pt`、`fr`、`ru`、`zh`、`ja`、`ko` 或 `ar` |
 | `ADMIN_KEY` | 导入 ZIP 主题的密钥 |
 | `PUID` / `PGID` | 有权读取这些目录的用户/组 ID |
 

@@ -1,4 +1,4 @@
-[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
+[English 🇬🇧](README.md) | [Deutsch 🇩🇪](README.de.md) | [Español 🇪🇸](README.es.md) | [Português 🇵🇹](README.pt.md) | [Français 🇫🇷](README.fr.md) | [Русский 🇷🇺](README.ru.md) | [中文 🇨🇳](README.zh.md) | [日本語 🇯🇵](README.ja.md) | [한국어 🇰🇷](README.ko.md) | [العربية 🇸🇦](README.ar.md)
 
 > **تنويه الترجمة:** أُعدّت الترجمات في هذا المشروع باستخدام الذكاء الاصطناعي، وقد تتضمن أخطاء.
 
@@ -37,7 +37,7 @@ cp .env.example .env
 | `NAVIDROME_NETWORK` | شبكة Docker الخاصة بـ Navidrome |
 | `NAVIDROME_DATA_DIR` | مجلد المضيف الذي يحتوي على `navidrome.db` |
 | `MUSIC_DIR_HOST` | مجلد الموسيقى على المضيف |
-| `WRAPPED_LANGUAGE` | `en` (افتراضي) أو `de` أو `es` أو `ru` أو `zh` أو `ja` أو `ko` أو `ar` |
+| `WRAPPED_LANGUAGE` | `en` (افتراضي) أو `de` أو `es` أو `pt` أو `fr` أو `ru` أو `zh` أو `ja` أو `ko` أو `ar` |
 | `ADMIN_KEY` | مفتاح استيراد السمات بصيغة ZIP |
 | `PUID` / `PGID` | معرف المستخدم/المجموعة اللذين يمكنهما قراءة المجلدات |
 
