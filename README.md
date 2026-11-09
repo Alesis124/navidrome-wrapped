@@ -10,6 +10,21 @@ historias con música de fondo (clips de 30 s de tus canciones top) y exportaci�
   un tema intercambiable que se importa como carpeta o zip. Ver [THEMES.md](THEMES.md).
 - **Bajo demanda:** no hay procesos en segundo plano; calcula al abrir la página.
 
+## Vista previa
+
+Así se reproduce el Wrapped y se ven sus primeras diapositivas:
+
+![Demostración del Wrapped](res/tuto.gif)
+
+La pantalla de inicio de sesión es opcional; se activa con `AUTH_USER` y `AUTH_PASSWORD`:
+
+![Pantalla de inicio de sesión](res/login.png)
+
+## Despliegue
+
+La aplicación se ejecuta en un contenedor Linux. En Windows 64 bits se puede desplegar con Docker Desktop y el backend WSL 2, siguiendo estos pasos desde WSL 2; no hay un ejecutable nativo para Windows ni soporte para Windows de 32 bits (x86). x86-64, también llamado x64 o amd64, significa 64 bits.
+
+
 ## Despliegue
 
 ```bash
