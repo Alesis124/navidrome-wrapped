@@ -80,6 +80,7 @@ el volumen como `external: true` al final del fichero.
 
 Pon el código de idioma que quieras en `WRAPPED_LANGUAGE` dentro de `.env` y ejecuta `./deploy.sh`.
 La interfaz, el login, los temas incluidos, las fechas y los números usarán ese idioma. Los temas personalizados mantienen sus textos originales salvo que incluyan traducciones para el idioma elegido.
+Cada visitante también puede cambiar el idioma desde el selector de la esquina superior derecha; la elección se recuerda en ese navegador y no cambia el idioma predeterminado del servidor.
 
 ### Dos detalles importantes
 

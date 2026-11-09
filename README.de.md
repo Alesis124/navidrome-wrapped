@@ -41,7 +41,7 @@ In `.env` sind insbesondere folgende Werte zu setzen:
 | `ADMIN_KEY` | Schlüssel zum Importieren von ZIP-Themes |
 | `PUID` / `PGID` | Benutzer- und Gruppen-ID mit Leserechten |
 
-Die Musik muss im Container unter demselben Pfad eingebunden sein, den Navidrome verwendet (üblicherweise `/music`). Nach Änderungen an `WRAPPED_LANGUAGE` `./deploy.sh` erneut ausführen. Eigene Themes benötigen eigene Übersetzungen.
+Die Musik muss im Container unter demselben Pfad eingebunden sein, den Navidrome verwendet (üblicherweise `/music`). Nach Änderungen an `WRAPPED_LANGUAGE` `./deploy.sh` erneut ausführen. Eigene Themes benötigen eigene Übersetzungen. Besucher können die Sprache auch über die Auswahl oben rechts ändern; die Auswahl wird im jeweiligen Browser gespeichert und ändert nicht die Standardsprache des Servers.
 
 ## Verwendung und Datenschutz
 

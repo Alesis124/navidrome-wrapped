@@ -13,7 +13,7 @@ import { $, initChrome, setState } from './ui.js';
 async function fetchWrapped(q) {
   const wp = new URLSearchParams();
   for (const k of ['user', 'year']) if (q.get(k)) wp.set(k, q.get(k));
-  const r = await fetch('/api/wrapped?' + wp);
+  const r = await window.NW_I18N.apiFetch('/api/wrapped?' + wp);
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.statusText);
   return r.json();
 }
@@ -41,10 +41,18 @@ function preloadCovers(data) {
 
 async function main() {
   const q = new URLSearchParams(location.search);
-  const config = await fetch('/api/config').then((r) => r.json())
+  const config = await window.NW_I18N.apiFetch('/api/config').then((r) => r.json())
     .catch(() => ({ import_enabled: false, default_year: new Date().getFullYear(), language: 'en' }));
-  const locale = window.NW_I18N.applyLanguage(config.language || 'en');
-  setLocale(config.language || 'en');
+  config.language = window.NW_I18N.resolveLanguage(config.language || 'en');
+  const locale = window.NW_I18N.applyLanguage(config.language);
+  setLocale(config.language);
+  $('#language').addEventListener('change', (event) => {
+    const language = event.currentTarget.value;
+    window.NW_I18N.savePreferredLanguage(language);
+    const url = new URL(location.href);
+    url.searchParams.set('lang', language);
+    location.assign(url);
+  });
 
   let theme;
   try { theme = await loadTheme(q.get('theme'), q.get('year')); }
@@ -383,7 +391,13 @@ function play(data, theme, chrome, q, locale) {
   slider.addEventListener('input', () => setVol(+slider.value));
   slider.addEventListener('change', () => slider.blur());   // que las flechas y M sigan funcionando
   $('.vol').addEventListener('wheel', (e) => { e.preventDefault(); setVol((bgm?.vol ?? vol) + (e.deltaY < 0 ? 0.05 : -0.05)); }, { passive: false });
-  const goHome = () => { location.href = location.pathname + (q.get('theme') ? `?theme=${encodeURIComponent(q.get('theme'))}` : ''); };
+  const goHome = () => {
+    const url = new URL(location.href);
+    url.search = '';
+    if (q.get('theme')) url.searchParams.set('theme', q.get('theme'));
+    if (q.get('lang')) url.searchParams.set('lang', q.get('lang'));
+    location.href = url;
+  };
   // Descargar: en un ordenador pregunta si la quieres apaisada o vertical; en un móvil descarga directamente
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const choose = () => new Promise((res) => {

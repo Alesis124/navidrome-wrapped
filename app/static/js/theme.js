@@ -1,7 +1,7 @@
 // Carga un tema desde /api/themes/<id>: tokens CSS, CSS, fuentes y (opcional) su script.
 export async function loadTheme(id, year) {
   const qs = year ? `?year=${encodeURIComponent(year)}` : '';
-  const r = await fetch(`/api/themes/${encodeURIComponent(id || 'default')}${qs}`);
+  const r = await window.NW_I18N.apiFetch(`/api/themes/${encodeURIComponent(id || 'default')}${qs}`);
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.statusText);
   const t = await r.json();
 

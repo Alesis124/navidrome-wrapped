@@ -1,4 +1,18 @@
+from contextvars import ContextVar, Token
+
 from .config import WRAPPED_LANGUAGE
+
+_request_language: ContextVar[str | None] = ContextVar("request_language", default=None)
+
+
+def set_request_language(language: str | None) -> Token:
+    value = (language or "").strip().lower()
+    return _request_language.set(value if value in _MESSAGES else None)
+
+
+def reset_request_language(token: Token) -> None:
+    _request_language.reset(token)
+
 
 _MESSAGES = {
     "en": {
@@ -125,4 +139,5 @@ _MESSAGES = {
 
 
 def tr(key: str, **values: object) -> str:
-    return _MESSAGES[WRAPPED_LANGUAGE][key].format(**values)
+    language = _request_language.get() or WRAPPED_LANGUAGE
+    return _MESSAGES[language][key].format(**values)

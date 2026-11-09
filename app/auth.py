@@ -12,7 +12,7 @@ from fastapi import Request
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from .config import AUTH_PASSWORD, AUTH_USER
-from .i18n import tr
+from .i18n import reset_request_language, set_request_language, tr
 
 ENABLED = bool(AUTH_USER and AUTH_PASSWORD)
 if bool(AUTH_USER) != bool(AUTH_PASSWORD):
@@ -84,13 +84,17 @@ def secure(request: Request) -> bool:
 
 
 async def middleware(request: Request, call_next):
-    if not ENABLED:
-        return await call_next(request)
-    path = request.url.path
-    if path in PUBLIC or valid_token(request.cookies.get(COOKIE)):
-        return await call_next(request)
-    if path.startswith("/api/"):
-        return JSONResponse({"detail": tr("login_required")}, status_code=401)
-    nxt = request.url.path + (("?" + request.url.query) if request.url.query else "")
-    from urllib.parse import quote
-    return RedirectResponse("/login?next=" + quote(nxt, safe=""), status_code=303)
+    language_token = set_request_language(request.headers.get("x-wrapped-language"))
+    try:
+        if not ENABLED:
+            return await call_next(request)
+        path = request.url.path
+        if path in PUBLIC or valid_token(request.cookies.get(COOKIE)):
+            return await call_next(request)
+        if path.startswith("/api/"):
+            return JSONResponse({"detail": tr("login_required")}, status_code=401)
+        nxt = request.url.path + (("?" + request.url.query) if request.url.query else "")
+        from urllib.parse import quote
+        return RedirectResponse("/login?next=" + quote(nxt, safe=""), status_code=303)
+    finally:
+        reset_request_language(language_token)

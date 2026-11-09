@@ -41,7 +41,7 @@ cp .env.example .env
 | `ADMIN_KEY` | 导入 ZIP 主题的密钥 |
 | `PUID` / `PGID` | 有权读取这些目录的用户/组 ID |
 
-容器中的音乐路径必须与 Navidrome 使用的路径一致（通常为 `/music`）。更改 `WRAPPED_LANGUAGE` 后，请重新运行 `./deploy.sh`。自定义主题需要提供对应语言的翻译。
+容器中的音乐路径必须与 Navidrome 使用的路径一致（通常为 `/music`）。更改 `WRAPPED_LANGUAGE` 后，请重新运行 `./deploy.sh`。自定义主题需要提供对应语言的翻译。访客也可以通过右上角的选择器更改语言；选择会保存在该浏览器中，不会更改服务器的默认语言。
 
 ## 使用与安全
 

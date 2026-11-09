@@ -51,7 +51,7 @@ export function initChrome({ q, theme, config }) {
   desktop.addEventListener('change', applyView);
   landscape.addEventListener('change', applyView);
 
-  fetch('/api/themes').then((r) => r.json()).then(({ themes }) => {
+  window.NW_I18N.apiFetch('/api/themes').then((r) => r.json()).then(({ themes }) => {
     const sel = $('#theme-pick'), list = themes.filter((t) => !t.error);
     sel.innerHTML = list.map((t) =>
       `<option value="${esc(t.id)}"${t.id === theme.id ? ' selected' : ''}>${esc(t.name)}</option>`).join('');
@@ -62,7 +62,10 @@ export function initChrome({ q, theme, config }) {
   // ---- Cerrar sesión (solo si el servidor tiene login)
   const out = $('#logout');
   out.hidden = !config.auth_enabled;
-  out.onclick = async () => { await fetch('/api/logout', { method: 'POST' }).catch(() => { }); location.href = '/login'; };
+  out.onclick = async () => {
+    await window.NW_I18N.apiFetch('/api/logout', { method: 'POST' }).catch(() => { });
+    location.href = `/login?lang=${encodeURIComponent(config.language || 'en')}`;
+  };
 
   // ---- Importar tema
   const dlg = $('#importer');
@@ -85,7 +88,7 @@ export function initChrome({ q, theme, config }) {
     btn.disabled = true;
     impMsg(t.uploading);
     try {
-      const r = await fetch(`/api/themes/import?force=${$('#imp-force').checked}`, {
+      const r = await window.NW_I18N.apiFetch(`/api/themes/import?force=${$('#imp-force').checked}`, {
         method: 'POST', body: file, headers: { 'Content-Type': 'application/zip', 'X-Admin-Key': key },
       });
       const j = await r.json().catch(() => ({}));
@@ -112,7 +115,7 @@ export function initChrome({ q, theme, config }) {
     go.disabled = true;
     if (!name) { yearSel.innerHTML = ''; yearSel.disabled = true; say(s.gate_hint ?? t.enter_username); return; }
     try {
-      const r = await fetch('/api/years?user=' + encodeURIComponent(name));
+      const r = await window.NW_I18N.apiFetch('/api/years?user=' + encodeURIComponent(name));
       const j = await r.json().catch(() => ({}));
       if (my !== seq) return;
       if (!r.ok) throw new Error(typeof j.detail === 'string' ? j.detail : r.statusText);

@@ -319,10 +319,46 @@ const messages = {
   },
 };
 
+const LANGUAGE_STORAGE_KEY = 'wrapped.language';
+let activeLanguage = 'en';
+const languageLabels = {
+  en: 'Interface language', de: 'Anzeigesprache', es: 'Idioma de la interfaz',
+  pt: 'Idioma da interface', fr: 'Langue de l’interface', ru: 'Язык интерфейса',
+  zh: '界面语言', ja: '表示言語', ko: '인터페이스 언어', ar: 'لغة الواجهة',
+};
+
+function resolveLanguage(defaultLanguage = 'en') {
+  const queryLanguage = new URLSearchParams(location.search).get('lang');
+  if (Object.hasOwn(messages, queryLanguage)) return queryLanguage;
+  try {
+    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (Object.hasOwn(messages, savedLanguage)) return savedLanguage;
+  } catch { /* The URL and server setting remain available if storage is blocked. */ }
+  return Object.hasOwn(messages, defaultLanguage) ? defaultLanguage : 'en';
+}
+
+function savePreferredLanguage(language) {
+  if (!Object.hasOwn(messages, language)) return false;
+  try {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function applyLanguage(language, root = document) {
-  const locale = messages[language] || messages.en;
+  language = Object.hasOwn(messages, language) ? language : 'en';
+  activeLanguage = language;
+  const locale = messages[language];
   root.documentElement?.setAttribute('lang', language);
   if (root.documentElement) root.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+  const languageSelect = root.querySelector('#language');
+  if (languageSelect) {
+    languageSelect.value = language;
+    languageSelect.setAttribute('aria-label', languageLabels[language]);
+    languageSelect.title = languageLabels[language];
+  }
   root.querySelectorAll('[data-i18n]').forEach((el) => {
     const text = locale.html[el.dataset.i18n];
     if (text !== undefined) el.textContent = text;
@@ -341,4 +377,10 @@ function applyLanguage(language, root = document) {
   return locale;
 }
 
-window.NW_I18N = { applyLanguage, messages };
+function apiFetch(input, init = {}) {
+  const headers = new Headers(init.headers || {});
+  headers.set('X-Wrapped-Language', activeLanguage);
+  return fetch(input, { ...init, headers });
+}
+
+window.NW_I18N = { applyLanguage, apiFetch, messages, resolveLanguage, savePreferredLanguage };

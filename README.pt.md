@@ -41,7 +41,7 @@ Configurações principais em `.env`:
 | `ADMIN_KEY` | Chave para importar temas ZIP |
 | `PUID` / `PGID` | IDs de usuário/grupo com acesso de leitura aos diretórios |
 
-A música deve ser montada no contêiner no mesmo caminho usado pelo Navidrome (normalmente `/music`). Para escolher português, defina `WRAPPED_LANGUAGE=pt` em `.env` e execute `./deploy.sh` para recriar o contêiner. Temas personalizados precisam incluir suas próprias traduções.
+A música deve ser montada no contêiner no mesmo caminho usado pelo Navidrome (normalmente `/music`). Para escolher português, defina `WRAPPED_LANGUAGE=pt` em `.env` e execute `./deploy.sh` para recriar o contêiner. Temas personalizados precisam incluir suas próprias traduções. Cada visitante também pode mudar o idioma no seletor no canto superior direito; a escolha fica salva naquele navegador e não altera o idioma padrão do servidor.
 
 ## Uso e segurança
 
