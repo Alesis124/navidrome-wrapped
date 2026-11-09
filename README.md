@@ -1,39 +1,35 @@
+[English 🇬🇧](README.md) | [Español 🇪🇸](README.es.md)
+
 # Navidrome Wrapped
 
-Resumen anual estilo "Wrapped" para tu Navidrome: top artistas y canciones, minutos escuchados,
-descubrimientos, datos curiosos (madrugadas, modo bucle, hora favorita…) y un reproductor de
-historias con música de fondo (clips de 30 s de tus canciones top) y exportación de cada tarjeta a PNG.
+An annual Wrapped-style recap for Navidrome: top artists and tracks, listening minutes, discoveries, fun stats (late-night listening, repeats, favorite hour, and more), plus a story player with background music (30-second clips from your top tracks) and PNG export for every card.
 
-- **Backend:** FastAPI + SQLite (solo lectura) + ffmpeg para los clips.
-- **Frontend:** HTML/CSS/JS + Swiper, sin build y sin CDN (todo va en `app/static/vendor`).
-- **Temas:** el aspecto (barra de progreso, transiciones, fondo, tipografía, textos, orden de diapositivas) es
-  un tema intercambiable que se importa como carpeta o zip. Ver [THEMES.md](THEMES.md).
-- **Bajo demanda:** no hay procesos en segundo plano; calcula al abrir la página.
+- **Backend:** FastAPI + read-only SQLite + ffmpeg for audio clips.
+- **Frontend:** HTML/CSS/JS + Swiper, with no build step or CDN (all assets are in `app/static/vendor`).
+- **Themes:** The appearance (progress bar, transitions, background, typography, text, and slide order) is an interchangeable theme that can be imported as a folder or ZIP. See [THEMES.md](THEMES.md).
+- **On demand:** No background jobs; stats are calculated when you open the page.
 
-## Vista previa
+## Preview
 
-Así se reproduce el Wrapped y se ven sus primeras diapositivas:
+Watch the Wrapped and see its first slides:
 
-![Demostración del Wrapped](res/tuto.gif)
+![Wrapped demo](res/tuto.gif)
 
-La pantalla de inicio de sesión es opcional; se activa con `AUTH_USER` y `AUTH_PASSWORD`:
+The login screen is optional and can be enabled with `AUTH_USER` and `AUTH_PASSWORD`:
 
-![Pantalla de inicio de sesión](res/login.png)
+![Login screen](res/login.png)
 
-## Despliegue
+## Deployment
 
-La aplicación se ejecuta en un contenedor Linux. En Windows 64 bits se puede desplegar con Docker Desktop y el backend WSL 2, siguiendo estos pasos desde WSL 2; no hay un ejecutable nativo para Windows ni soporte para Windows de 32 bits (x86). x86-64, también llamado x64 o amd64, significa 64 bits.
-
-
-## Despliegue
+The application runs in a Linux container. On 64-bit Windows, you can deploy it with Docker Desktop and the WSL 2 backend by following these steps from WSL 2. There is no native Windows executable or support for 32-bit Windows (x86). x86-64, also called x64 or amd64, means 64-bit.
 
 ```bash
-cp .env.example .env      # y edítalo (ver abajo)
-./deploy.sh               # primera vez y cada vez que cambies el código
-# → http://IP-DEL-SERVIDOR:8100/
+cp .env.example .env      # then edit it (see below)
+./deploy.sh               # on first setup and whenever you change the code
+# → http://SERVER-IP:8100/
 ```
 
-`deploy.sh` ejecuta, en este orden, lo de siempre:
+`deploy.sh` runs the following commands:
 
 ```bash
 sudo chmod -R 755 app/
@@ -41,163 +37,128 @@ docker compose down
 docker compose up -d --build
 ```
 
-y además deja `./themes` con el dueño `PUID:PGID` para que la web pueda instalar temas importados.
+It also sets `./themes` to owner `PUID:PGID` so the web app can install imported themes.
 
-### Cómo se usa
+### Usage
 
-- **Móvil:** el Wrapped ocupa toda la pantalla. Se toca a la derecha para avanzar, a la izquierda para
-  retroceder y se mantiene pulsado para pausar.
-- **Ordenador** (ventana de 1000 px o más y apaisada): con cualquiera de los temas incluidos la tarjeta ocupa **toda la
-  ventana** con una maquetación apaisada propia (texto a la izquierda, discos, gráficas y carátulas a la
-  derecha). Atajos: ← → o espacio para moverte, `H` vuelve al inicio, `M` silencio (pasa el ratón por el altavoz para bajar el volumen), `S` guarda la tarjeta como imagen (en un ordenador pregunta si la quieres apaisada o vertical)
-  (en la vista ancha sale apaisada). La vista es automática: en un ordenador sale la ancha y en un
-  móvil (o una ventana estrecha) el marco 9:16. También se salta a una diapositiva pulsando su tramo de la barra de progreso. Classic y Neón también
-  tienen vista ancha; un tema sin maquetación apaisada usa siempre el marco 9:16.
-- **Al abrir la página** cada persona escribe su usuario de Navidrome (no distingue mayúsculas; la
-  página recuerda el último) y elige entre los años en que tiene reproducciones. No se lista a los demás
-  usuarios. Un enlace directo sigue valiendo: `/?user=Alesis&year=2026`.
-- **Importar temas:** botón «Importar tema (.zip)» en la pantalla de inicio. Pide la clave `ADMIN_KEY`;
-  `./deploy.sh` la crea sola en `.env` la primera vez y la muestra por pantalla.
+- **Mobile:** The Wrapped fills the screen. Tap the right side to advance, the left side to go back, or press and hold to pause.
+- **Desktop** (landscape window at least 1000 px wide): With any included theme, the card fills the **entire window** using a dedicated landscape layout (text on the left, records, charts, and covers on the right). Shortcuts: ← → or Space to navigate, `H` to return to the start, `M` to mute (hover over the speaker to adjust volume), and `S` to save the card as an image (on desktop, choose landscape or portrait; wide view exports in landscape). The view is selected automatically: landscape on desktop, 9:16 on mobile or in a narrow window. You can also jump to a slide by clicking its segment in the progress bar. Classic and Neon also have a wide layout; themes without a landscape layout always use the 9:16 frame.
+- **When opening the page,** each person enters their Navidrome username (case-insensitive; the page remembers the last one) and selects a year with listening history. Other users are not listed. Direct links still work: `/?user=Alesis&year=2026`.
+- **Import themes:** Use the “Import theme (.zip)” button on the start screen. It asks for the `ADMIN_KEY`; `./deploy.sh` generates one in `.env` on first run and displays it.
 
-### Qué hay que ajustar en `.env`
+### `.env` settings
 
-| Variable | Qué poner |
+| Variable | What to set |
 |---|---|
-| `NAVIDROME_NETWORK` | Red Docker de Navidrome: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
-| `NAVIDROME_DATA_DIR` | Carpeta del host con `navidrome.db` (la que Navidrome monta en `/data`) |
-| `MUSIC_DIR_HOST` | Carpeta del host con la música (la misma que Navidrome monta en `/music`) |
-| `NAVIDROME_USER` | Opcional: usuario por defecto solo para la API; la página lo pide al entrar |
-| `ADMIN_KEY` | Clave para importar temas `.zip` desde la web. Si está vacía, `./deploy.sh` genera una; vacía a mano = importar desactivado |
-| `PUID` / `PGID` | Usuario que puede leer esas carpetas (`ls -ln /opt/navidrome/data`) |
+| `NAVIDROME_NETWORK` | Navidrome's Docker network: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
+| `NAVIDROME_DATA_DIR` | Host directory containing `navidrome.db` (the one Navidrome mounts at `/data`) |
+| `MUSIC_DIR_HOST` | Host directory containing the music (the same one Navidrome mounts at `/music`) |
+| `NAVIDROME_USER` | Optional default user for the API only; the page asks for a user when opened |
+| `ADMIN_KEY` | Key for importing `.zip` themes from the web. If empty, `./deploy.sh` generates one; if left empty manually, importing is disabled |
+| `PUID` / `PGID` | User allowed to read those directories (`ls -ln /opt/navidrome/data`) |
 
-Si Navidrome guarda los datos en un **volumen con nombre** en lugar de una carpeta, cambia en
-`docker-compose.yml` la línea `${NAVIDROME_DATA_DIR}:/data:ro` por `navidrome_data:/data:ro` y declara
-el volumen como `external: true` al final del fichero.
+If Navidrome stores its data in a **named volume** instead of a directory, change
+`${NAVIDROME_DATA_DIR}:/data:ro` in `docker-compose.yml` to `navidrome_data:/data:ro` and declare the volume as `external: true` at the end of the file.
 
-### Dos detalles importantes
+### Two important details
 
-**1. La música debe montarse en la misma ruta que usa Navidrome.** La tabla `media_file` guarda rutas
-absolutas tal y como las ve el contenedor de Navidrome (normalmente `/music/...`). Aquí también se
-monta en `/music`. Si tu Navidrome usa otra ruta (`ND_MUSICFOLDER`), monta tu carpeta en esa misma ruta
-dentro de este contenedor.
+**1. Mount the music at the same path Navidrome uses.** The `media_file` table stores absolute paths as seen by the Navidrome container (usually `/music/...`). This container mounts it at `/music` too. If your Navidrome uses another path (`ND_MUSICFOLDER`), mount your music directory at that same path inside this container.
 
-**2. Base de datos `:ro` con SQLite en modo WAL.** Navidrome usa WAL, y abrir una BD WAL en un volumen
-montado como solo lectura puede fallar (`unable to open database file`). Por eso `app/db.py` prueba
-primero la apertura directa (`mode=ro`) y, si falla, copia `navidrome.db` y `navidrome.db-wal` a
-`/cache/snapshot` y consulta la copia. La copia se renueva cuando cambia la BD (máximo cada
-`SNAPSHOT_TTL` segundos, 60 por defecto). Lo que usa se ve en `/api/health` → `db_access`.
-Puedes forzarlo con `DB_ACCESS=direct` o `DB_ACCESS=snapshot`.
+**2. Read-only SQLite database in WAL mode.** Navidrome uses WAL, and opening a WAL database on a read-only volume can fail with `unable to open database file`. Therefore, `app/db.py` first tries to open the database directly (`mode=ro`); if that fails, it copies `navidrome.db` and `navidrome.db-wal` to `/cache/snapshot` and queries the copy. The snapshot is refreshed when the database changes (at most every `SNAPSHOT_TTL` seconds, 60 by default). The active mode is shown at `/api/health` → `db_access`. You can force it with `DB_ACCESS=direct` or `DB_ACCESS=snapshot`.
 
-### Seguridad
+### Security
 
-El contenedor corre sin root, con el sistema de ficheros en solo lectura (excepto `/cache` y `/tmp`),
-sin capabilities y con `no-new-privileges`. No hay autenticación propia: cualquiera que alcance el
-puerto puede pedir el Wrapped de cualquier usuario. Si lo expones fuera de casa, ponlo detrás de tu
-proxy inverso con login o quita el `ports:` y accede solo por la red de Navidrome.
+The container runs as a non-root user, with a read-only filesystem (except `/cache` and `/tmp`), no capabilities, and `no-new-privileges`. There is no built-in authentication: anyone who can reach the port can request any user's Wrapped. If you expose it outside your home network, put it behind an authenticated reverse proxy or remove `ports:` and access it only through the Navidrome network.
 
-La importación de temas está desactivada salvo que definas `ADMIN_KEY`, porque un tema puede ejecutar
-JavaScript en el navegador de quien lo abra. Los zips se validan (rutas, enlaces simbólicos, tamaño,
-extensiones) y no pueden sustituir a los temas incluidos.
+Theme importing is disabled unless you define `ADMIN_KEY`, because a theme can run JavaScript in the browser of anyone who opens it. ZIP files are validated (paths, symbolic links, size, and extensions) and cannot replace the included themes.
 
 ## API
 
-| Ruta | Descripción |
+| Route | Description |
 |---|---|
-| `GET /api/health` | Estado, modo (`scrobbles` / `annotation`) y tipo de acceso a la BD |
-| `GET /api/users` | Usuarios de Navidrome |
-| `GET /api/years?user=` | Años con reproducciones de un usuario (y su nombre exacto) |
-| `GET /api/config` | Año por defecto y si la importación de temas está activa |
-| `POST /api/themes/import` | Instala un tema desde un `.zip` (cuerpo `application/zip`, cabecera `X-Admin-Key`; `?force=true` sustituye) |
-| `GET /api/wrapped?user=&year=` | Todas las métricas en JSON |
-| `GET /api/themes` · `GET /api/themes/{id}` | Temas instalados / un tema resuelto (con herencia) |
-| `GET /themes/{id}/{fichero}` | Ficheros de un tema (CSS, fuentes, imágenes) |
-| `GET /api/clip/{track_id}?seconds=30` | Clip MP3 (cacheado en `/cache/clips`) |
-| `GET /api/cover/{track_id}` | Carátula (cacheada en `/cache/covers`) |
-| `GET /api/cover/{track_id}/blur` | Malla de color desenfocada de la carátula (cacheada en `/cache/blur`) |
+| `GET /api/health` | Status, mode (`scrobbles` / `annotation`), and database access type |
+| `GET /api/users` | Navidrome users |
+| `GET /api/years?user=` | Years with listening history for a user (and the user's exact name) |
+| `GET /api/config` | Default year and whether theme importing is enabled |
+| `POST /api/themes/import` | Installs a theme from a `.zip` (`application/zip` body, `X-Admin-Key` header; `?force=true` replaces an existing theme) |
+| `GET /api/wrapped?user=&year=` | All metrics as JSON |
+| `GET /api/themes` · `GET /api/themes/{id}` | Installed themes / a resolved theme (with inheritance) |
+| `GET /themes/{id}/{file}` | Theme files (CSS, fonts, images) |
+| `GET /api/clip/{track_id}?seconds=30` | MP3 clip (cached in `/cache/clips`) |
+| `GET /api/cover/{track_id}` | Cover art (cached in `/cache/covers`) |
+| `GET /api/cover/{track_id}/blur` | Blurred color mesh from the cover art (cached in `/cache/blur`) |
 
-Sin la tabla `scrobbles` (Navidrome antiguo) cae a `annotation`: top canciones y minutos aproximados,
-sin horas ni bucles.
+Without the `scrobbles` table (older Navidrome versions), the app falls back to `annotation`: top tracks and approximate listening minutes, without listening times or repeat stats.
 
-## Temas (un diseño distinto cada año)
+## Themes (a different design each year)
 
 ```bash
-python scripts/theme.py new 2027 --extends frecuencia   # crea themes/2027/ (hereda de un tema incluido)
-python scripts/theme.py install tema.zip          # importa un tema de otra persona o de otra máquina
-python scripts/theme.py pack themes/2027          # lo empaqueta para guardarlo o compartirlo
+python scripts/theme.py new 2027 --extends frecuencia   # creates themes/2027/ (inherits from an included theme)
+python scripts/theme.py install theme.zip              # imports a theme from another person or machine
+python scripts/theme.py pack themes/2027               # packages it for backup or sharing
 ```
 
-`./themes` está montado en el contenedor, así que **no hay que reconstruir ni reiniciar**: recarga la página.
-El tema se elige con `?theme=2027`, con `WRAPPED_THEME` o, si existe un tema con el nombre del año pedido
-(`themes/2027` para `year=2027`), se usa solo. Incluidos: `frecuencia` (por defecto) y `remix` (React + motion). Todo el detalle
-(manifiesto, plantillas, CSS, hooks, transiciones) está en [THEMES.md](THEMES.md).
+`./themes` is mounted in the container, so **there is no need to rebuild or restart**: just reload the page.
+Select a theme with `?theme=2027`, `WRAPPED_THEME`, or automatically by creating a theme whose name matches the requested year (for example, `themes/2027` for `year=2027`). Included themes: `frecuencia` (default) and `remix` (React + motion). See [THEMES.md](THEMES.md) for details on manifests, templates, CSS, hooks, and transitions.
 
-## Probar sin tu servidor
+## Try it without your server
 
 ```bash
 pip install -r requirements.txt
-python scripts/make_demo.py --out demo          # BD + música de mentira (necesita ffmpeg)
+python scripts/make_demo.py --out demo          # fake database and music (requires ffmpeg)
 DB_PATH=demo/navidrome.db MUSIC_DIR=demo/music CACHE_DIR=demo/cache \
 NAVIDROME_USER=demo WRAPPED_YEAR=2026 uvicorn app.main:app --reload
 # → http://localhost:8000
 ```
 
-## Estructura
+## Project structure
 
 ```
 app/
-  main.py      rutas FastAPI
-  config.py    variables de entorno
-  db.py        conexión a la BD (directa o snapshot)
+  main.py      FastAPI routes
+  config.py    environment variables
+  db.py        database connection (direct or snapshot)
   queries.py   SQL
-  stats.py     métricas y datos curiosos
-  audio.py     clips y carátulas con ffmpeg
-  themes.py    carga, herencia y validación de temas
-  themes/      temas incluidos (frecuencia, remix)
-  static/      index.html, css/base.css, js/ (motor), vendor/ (Swiper, html2canvas)
-themes/        tus temas (montado en /themes)
-scripts/       make_demo.py (datos de prueba) · theme.py (new/validate/pack/install)
+  stats.py     metrics and fun stats
+  audio.py     clips and cover art with ffmpeg
+  themes.py    theme loading, inheritance, and validation
+  themes/      included themes (frecuencia, remix)
+  static/      index.html, css/base.css, js/ (engine), vendor/ (Swiper, html2canvas)
+themes/        your themes (mounted at /themes)
+scripts/       make_demo.py (test data) · theme.py (new/validate/pack/install)
 Dockerfile · docker-compose.yml · .env.example · THEMES.md
 ```
 
-## Problemas habituales
+## Troubleshooting
 
-- **`fichero no accesible` en `/api/clip`:** la música no está montada en la misma ruta que ve Navidrome.
-- **`unable to open database file`:** pon `DB_ACCESS=snapshot`, o comprueba que `PUID`/`PGID` pueden leer la carpeta de datos.
-- **Un tema no carga:** `python scripts/theme.py validate themes/<id>` o mira `/api/themes` (cada tema inválido muestra su error).
-- **Sin sonido al abrir:** el navegador exige un toque; por eso hay pantalla de inicio con el botón "Empezar".
-- **«No se puede escribir en /themes» al importar un tema:** `sudo chown -R PUID:PGID themes` (lo hace `deploy.sh`).
-- **"Sin reproducciones de X en 2026":** comprueba `?user=` (distingue mayúsculas) y `?year=`.
+- **`file not accessible` at `/api/clip`:** The music is not mounted at the same path Navidrome uses.
+- **`unable to open database file`:** Set `DB_ACCESS=snapshot`, or check that `PUID`/`PGID` can read the data directory.
+- **A theme does not load:** Run `python scripts/theme.py validate themes/<id>` or check `/api/themes` (invalid themes show their error).
+- **No sound on startup:** Browsers require a user gesture; use the start screen's “Start” button.
+- **“Cannot write to /themes” when importing a theme:** Run `sudo chown -R PUID:PGID themes` (`deploy.sh` does this).
+- **“No plays for X in 2026”:** Check `?user=` (case-sensitive) and `?year=`.
 
-## Temas con React + motion (opcional)
+## React + motion themes (optional)
 
-Los temas pueden elegir motor en `theme.json`: `"engine": "html"` (por defecto, plantillas + CSS) o
-`"engine": "react"` (un componente de React con la librería `motion`, todo código abierto).
-El tema React «Remix» viene incluido: ábrelo con `/?theme=remix`. Guía completa en `THEMES.md` (sección «Motores») y herramientas de
-compilación en `theme-kit/`. Para desplegar no necesitas Node.
+Themes can choose their engine in `theme.json`: `"engine": "html"` (default, templates + CSS) or `"engine": "react"` (a React component using the open-source `motion` library).
+The React theme “Remix” is included; open it with `/?theme=remix`. See the “Engines” section in [THEMES.md](THEMES.md) and the build tools in `theme-kit/`. Node is not required for deployment.
 
+## Optional login
 
-## Login opcional
-
-Para que la web pida usuario y contraseña, pon en `.env`:
+To require a username and password on the website, add these to `.env`:
 
     AUTH_USER=alesis
-    AUTH_PASSWORD=una-contraseña-larga
+    AUTH_PASSWORD=a-long-password
 
-y ejecuta `./deploy.sh`. Con los dos vacíos (o sin esas líneas) no hay login. Si defines solo uno, el servidor no arranca
-y te lo dice. La sesión dura 30 días (cookie firmada y solo HTTP); al cambiar el usuario o la contraseña se cierran todas.
-Tras 5 intentos fallidos desde una misma IP hay que esperar 5 minutos. En la pantalla de inicio aparece «Cerrar sesión».
-Protege toda la web (también la API, las carátulas y los clips). Si la expones a internet, ponla detrás de HTTPS; y si la
-contraseña lleva `$`, escríbela como `$$` en el `.env` (lo exige Docker Compose).
+Then run `./deploy.sh`. If both are empty (or omitted), login is disabled. If only one is set, the server will not start and will display an error. Sessions last 30 days (signed, HTTP-only cookie); changing the username or password invalidates all sessions.
+After 5 failed attempts from the same IP address, login is blocked for 5 minutes. A “Log out” button appears on the start screen.
+Login protects the entire site, including the API, cover art, and clips. If you expose the app to the internet, put it behind HTTPS. If the password contains `$`, write it as `$$` in `.env` (a Docker Compose requirement).
 
+## Updates and releases
 
-## Actualizar y versiones
+The version is defined in `app/version.py` (and shown at `/api/health`). Each push to `main` publishes the `ghcr.io/alesis124/navidrome-wrapped` image to GHCR with the `latest` and version tags (for example, `1.1.0`). To publish a new release, update the version in `app/version.py` and add an entry to `CHANGELOG.md`.
 
-La versión está en `app/version.py` (se ve en `/api/health`). Cada `push` a `main` publica en GHCR la imagen
-`ghcr.io/alesis124/navidrome-wrapped` con las etiquetas `latest` y la versión (por ejemplo `1.1.0`). Para publicar una nueva,
-sube el número en `app/version.py` y anótalo en `CHANGELOG.md`.
+    docker compose pull && docker compose up -d      # update to the latest published image
+    ./deploy.sh                                      # or build it on the server from source
 
-    docker compose pull && docker compose up -d      # actualizar a la última imagen publicada
-    ./deploy.sh                                      # o construirla en el servidor desde el código
-
-Para que otras personas puedan hacer `pull`, el paquete tiene que ser público (GitHub → tu perfil → Packages →
-navidrome-wrapped → Package settings → Change visibility).
+To let others pull the image, make the package public (GitHub → your profile → Packages → navidrome-wrapped → Package settings → Change visibility).
