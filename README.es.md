@@ -69,6 +69,7 @@ y además deja `./themes` con el dueño `PUID:PGID` para que la web pueda instal
 |---|---|
 | `DATA_SOURCE` | `local` (modo SQLite predeterminado) o `api` (API compatible con Subsonic de Navidrome) |
 | `NAVIDROME_URL` | URL base HTTPS pública opcional. Si queda vacía en modo API, cada visitante escribe una. Debe resolver solo a IP públicas; se bloquean localhost, redes privadas y direcciones de enlace local |
+| `FORWARDED_ALLOW_IPS` | IP/CIDR del proxy inverso de confianza para Uvicorn. Configúrala si HTTPS termina en el proxy, para que la aplicación reconozca el esquema HTTPS reenviado. No uses `*` si el puerto de la aplicación es accesible directamente |
 | `NAVIDROME_NETWORK` | Solo modo local: red Docker de Navidrome: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
 | `NAVIDROME_DATA_DIR` | Solo modo local: carpeta del host con `navidrome.db` (la que Navidrome monta en `/data`) |
 | `MUSIC_DIR_HOST` | Solo modo local: carpeta del host con la música (la misma que Navidrome monta en `/music`) |
@@ -90,14 +91,24 @@ Cada visitante puede elegir el idioma en la pantalla inicial, antes de abrir el 
 El `docker-compose.yml` y `./deploy.sh` existentes conservan el modo SQLite local y sus montajes de base de datos y música. Para ejecutar la aplicación sin esos montajes, configura `DATA_SOURCE=api` (o déjalo vacío) y usa este Compose:
 
 ```bash
-docker compose -f docker-compose.api.yml up -d --build
+docker compose -f docker-compose.api.yml pull
+docker compose -f docker-compose.api.yml up -d --no-build
+```
+
+Si no tienes el Compose en el directorio, puedes leerlo desde GitHub con `curl` y pasarlo directamente a Docker: así se descarga la imagen publicada, no el código fuente.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Alesis124/navidrome-wrapped/main/docker-compose.api.yml | docker compose -f - pull
+curl -fsSL https://raw.githubusercontent.com/Alesis124/navidrome-wrapped/main/docker-compose.api.yml | docker compose -f - up -d --no-build
 ```
 
 Define `NAVIDROME_URL` para usar un servidor público fijo; si está vacía, cada visitante escribe una URL pública en la pantalla de configuración. Cada persona se conecta con su usuario y contraseña de Navidrome o con un token y salt de Subsonic. Las credenciales se envían en el cuerpo de la solicitud a este servidor Wrapped, se mantienen solo en la memoria del proceso durante la sesión y se usan para llamar directamente a la API Subsonic de Navidrome. El navegador recibe únicamente una cookie de sesión opaca y `HttpOnly`: las credenciales no aparecen en el almacenamiento del navegador, en la URL de la página ni en el JavaScript de los temas. Las sesiones caducan tras ocho horas y se pierden al reiniciar el servidor. No ejecutes varios procesos worker o réplicas: las sesiones solo existen en la memoria del proceso.
 
+El Compose de API monta `./themes` y pasa `ADMIN_KEY`, por lo que están disponibles el selector y la importación de temas ZIP. Para importar, la carpeta `themes` del host debe permitir escritura al usuario configurado en `PUID`/`PGID`. En este modo, los temas solo pueden cambiar colores, fuentes y CSS; el código JavaScript y React nunca se sirve como contenido ejecutable.
+
 El modo API solo muestra metadatos actuales de las carpetas de música y una lista breve de álbumes recientes. No son datos de un año concreto: la [API compatible con Subsonic](https://www.navidrome.org/docs/developers/subsonic-api/) no ofrece historial por reproducción, por lo que este modo no crea gráficas anuales ni estadísticas inventadas. Las carátulas pasan por el servidor y no se guardan en la caché de la aplicación. El modo API no monta ni escribe una caché persistente.
 
-Las URLs configuradas o introducidas deben usar HTTPS y resolver exclusivamente a IP públicas. La propia web Wrapped también debe abrirse con HTTPS para enviar las credenciales; el modo API rechaza los envíos por HTTP sin cifrar. Se rechazan localhost, IP privadas, direcciones de enlace local y resultados DNS que mezclen IP públicas y privadas. El backend se conecta directamente a la IP validada, no usa proxies definidos por el entorno y no sigue redirecciones. Este modo está pensado para URLs públicas de Internet; no permite conectar a Navidrome en una dirección privada o de la red local.
+Las URLs configuradas o introducidas deben usar HTTPS y resolver exclusivamente a IP públicas. La propia web Wrapped también debe abrirse con HTTPS para enviar las credenciales; el modo API rechaza los envíos por HTTP sin cifrar. Si HTTPS termina en un proxy inverso, configura `FORWARDED_ALLOW_IPS` con la IP o red del proxy tal como se ve desde este contenedor, y asegúrate de que envía `X-Forwarded-Proto: https`. Uvicorn solo confía en cabeceras reenviadas desde esas direcciones. No uses `*` si el puerto de la aplicación es accesible directamente. Se rechazan localhost, IP privadas, direcciones de enlace local y resultados DNS que mezclen IP públicas y privadas. El backend se conecta directamente a la IP validada, no usa proxies definidos por el entorno y no sigue redirecciones. Este modo está pensado para URLs públicas de Internet; no permite conectar a Navidrome en una dirección privada o de la red local.
 
 ### Dos detalles importantes
 
@@ -122,9 +133,10 @@ En modo API, cada visitante debe introducir sus propias credenciales de Navidrom
 
 La aplicación no envía datos a quienes mantienen el proyecto. Las solicitudes y cookies sí pasan por el navegador y por el servidor donde despliegas la aplicación. El modo local conserva el comportamiento existente de preferencias/nombre de usuario en el navegador y caché en disco. En modo API, las credenciales o el token de Navidrome se guardan solo en la memoria del proceso, pero el navegador conserva una cookie opaca de sesión y mantiene temporalmente los datos del formulario/solicitud en memoria; las preferencias de idioma pueden permanecer en el almacenamiento del navegador. Las respuestas API y carátulas usan `no-store`, y el modo API no escribe una caché de la aplicación en disco. Usa HTTPS y controles de acceso si expones el Wrapped a Internet.
 
-La importación de temas está desactivada salvo que definas `ADMIN_KEY`, porque un tema puede ejecutar
-JavaScript en el navegador de quien lo abra. Los zips se validan (rutas, enlaces simbólicos, tamaño,
-extensiones) y no pueden sustituir a los temas incluidos.
+La importación de temas está desactivada salvo que definas `ADMIN_KEY`. Los zips se validan (rutas,
+enlaces simbólicos, tamaño, extensiones) y no pueden sustituir a los temas incluidos. En modo API,
+los temas importados solo pueden cambiar colores, fuentes y CSS; su código JavaScript/React no se
+envía ni ejecuta en el navegador.
 
 ## API
 

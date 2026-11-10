@@ -168,6 +168,41 @@ class ApiSessionRouteTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(error.exception.status_code, 400)
         create_session.assert_not_called()
 
+    async def test_untrusted_forwarded_https_header_does_not_enable_credentials_over_http(self):
+        request = Request(
+            {"username": "listener", "password": "secret"},
+            origin="http://testserver", scheme="http",
+        )
+        request.headers["x-forwarded-proto"] = "https"
+        with patch.object(main, "DATA_SOURCE", "api"), patch.object(
+            main.navidrome_api, "create_session"
+        ) as create_session:
+            with self.assertRaises(HTTPException) as error:
+                await main.api_source_session(request)
+        self.assertEqual(error.exception.status_code, 400)
+        create_session.assert_not_called()
+
+    def test_api_theme_bundle_excludes_executable_theme_fields(self):
+        theme = {
+            "id": "custom", "name": "Custom", "tokens": {"--bg": "#000"},
+            "fonts": [], "css": ["/themes/custom/theme.css"],
+            "script": "/themes/custom/theme.js", "entry": "/themes/custom/theme.js",
+            "engine": "react", "templates": {"intro": "script"},
+        }
+        with patch.object(main, "DATA_SOURCE", "api"), patch.object(
+            main.themes, "load", return_value=theme
+        ):
+            result = main.theme_bundle("custom")
+        self.assertEqual(set(result), {"id", "name", "tokens", "fonts", "css"})
+        self.assertEqual(result["tokens"], {"--bg": "#000"})
+
+    def test_api_theme_list_is_available(self):
+        with patch.object(main, "DATA_SOURCE", "api"), patch.object(
+            main.themes, "default_id", return_value="frequency"
+        ), patch.object(main.themes, "list_themes", return_value=[{"id": "frequency"}]):
+            result = main.themes_list()
+        self.assertEqual(result, {"default": "frequency", "themes": [{"id": "frequency"}]})
+
     async def test_summary_requires_cookie_session(self):
         with patch.object(main, "DATA_SOURCE", "api"), patch.object(
             main.navidrome_api, "get_session", return_value=None

@@ -243,7 +243,6 @@ async def cover_blur(track_id: str):
 
 @app.get("/api/themes")
 def themes_list():
-    require_local_source()
     return {"default": themes.default_id(DEFAULT_YEAR), "themes": themes.list_themes()}
 
 
@@ -254,7 +253,6 @@ async def theme_import(request: Request, force: bool = Query(False), id: str | N
     Un tema puede ejecutar JavaScript en el navegador de quien lo abra, así que solo se
     acepta con la clave ADMIN_KEY (cabecera X-Admin-Key); sin clave configurada está desactivado.
     """
-    require_local_source()
     if not ADMIN_KEY:
         raise HTTPException(403, tr("import_disabled"))
     if not hmac.compare_digest(request.headers.get("x-admin-key", "").encode(), ADMIN_KEY.encode()):
@@ -278,9 +276,12 @@ async def theme_import(request: Request, force: bool = Query(False), id: str | N
 @app.get("/api/themes/{theme_id}")
 def theme_bundle(theme_id: str, year: int = Query(DEFAULT_YEAR)):
     """theme_id = «default» resuelve ?theme > WRAPPED_THEME > tema del año > frecuencia."""
-    require_local_source()
     try:
-        return themes.load(themes.default_id(year) if theme_id == "default" else theme_id)
+        bundle = themes.load(themes.default_id(year) if theme_id == "default" else theme_id)
+        if DATA_SOURCE == "api":
+            # API mode can use theme colors and styles, but never executes imported theme code.
+            bundle = {key: bundle[key] for key in ("id", "name", "tokens", "fonts", "css")}
+        return bundle
     except themes.ThemeNotFound as e:
         raise HTTPException(404, str(e))
     except themes.ThemeError as e:
@@ -289,7 +290,6 @@ def theme_bundle(theme_id: str, year: int = Query(DEFAULT_YEAR)):
 
 @app.get("/themes/{theme_id}/{path:path}")
 def theme_file(theme_id: str, path: str):
-    require_local_source()
     try:
         f = themes.resolve_file(theme_id, path)
     except themes.ThemeError:

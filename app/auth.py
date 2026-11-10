@@ -80,7 +80,8 @@ def clear(ip: str):
 
 
 def secure(request: Request) -> bool:
-    return request.url.scheme == "https" or request.headers.get("x-forwarded-proto", "") == "https"
+    # Uvicorn applies X-Forwarded-Proto to request.url.scheme only for trusted proxies.
+    return request.url.scheme == "https"
 
 
 async def middleware(request: Request, call_next):

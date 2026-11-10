@@ -78,6 +78,20 @@ const privacy = {
   ko: '이 앱은 분석 데이터를 수집하거나 프로젝트 관리자에게 정보를 보내지 않습니다. Navidrome 자격 증명은 이 Wrapped 서버로 전송되며 최대 8시간 동안 메모리에 보관됩니다. HTTPS를 사용하세요.',
   ar: 'لا يجمع هذا التطبيق بيانات التحليلات ولا يرسل معلومات إلى القائمين على المشروع. تُرسل بيانات اعتماد Navidrome إلى خادم Wrapped هذا وتُحفظ في ذاكرته لمدة تصل إلى ثماني ساعات. استخدم HTTPS.',
 };
+const httpsError = {
+  en: 'Open Wrapped over HTTPS. If HTTPS ends at a reverse proxy, configure FORWARDED_ALLOW_IPS for that proxy.',
+  de: 'Öffne Wrapped über HTTPS. Wenn HTTPS am Reverse-Proxy endet, konfiguriere FORWARDED_ALLOW_IPS für diesen Proxy.',
+  es: 'Abre Wrapped mediante HTTPS. Si HTTPS termina en un proxy inverso, configura FORWARDED_ALLOW_IPS con la dirección de ese proxy.',
+  pt: 'Abra o Wrapped por HTTPS. Se o HTTPS terminar num proxy reverso, configure FORWARDED_ALLOW_IPS para esse proxy.',
+  fr: 'Ouvrez Wrapped en HTTPS. Si HTTPS se termine sur un proxy inverse, configurez FORWARDED_ALLOW_IPS pour ce proxy.',
+  it: 'Apri Wrapped tramite HTTPS. Se HTTPS termina su un reverse proxy, configura FORWARDED_ALLOW_IPS per quel proxy.',
+  nl: 'Open Wrapped via HTTPS. Eindigt HTTPS bij een reverse proxy, configureer dan FORWARDED_ALLOW_IPS voor die proxy.',
+  ru: 'Откройте Wrapped по HTTPS. Если HTTPS завершается на обратном прокси, укажите его адрес в FORWARDED_ALLOW_IPS.',
+  zh: '请通过 HTTPS 打开 Wrapped。如果 HTTPS 在反向代理处终止，请在 FORWARDED_ALLOW_IPS 中配置该代理地址。',
+  ja: 'Wrapped を HTTPS で開いてください。HTTPS がリバースプロキシで終端される場合は、FORWARDED_ALLOW_IPS にそのプロキシを設定してください。',
+  ko: 'Wrapped를 HTTPS로 여세요. HTTPS가 리버스 프록시에서 종료되면 해당 프록시를 FORWARDED_ALLOW_IPS에 설정하세요.',
+  ar: 'افتح Wrapped عبر HTTPS. إذا انتهى HTTPS عند وكيل عكسي، فأضف عنوانه إلى FORWARDED_ALLOW_IPS.',
+};
 
 function message(element, text, error = false) {
   element.textContent = text || '';
@@ -93,12 +107,21 @@ export async function initApiMode(config, locale) {
   const status = byId('api-message');
   const summaryEl = byId('api-summary');
   const urlField = document.querySelector('.api-url-field');
+  const options = byId('options');
+  const themePicker = byId('theme-pick');
+  const themeOption = themePicker.closest('.opt-sel');
+  const themes = new Map();
+  const activeThemeTokens = new Set();
+  const initialThemeTokens = new Map();
+  let loginRedirected = false;
 
   document.body.dataset.source = 'api';
   document.body.dataset.state = 'gate';
   panel.hidden = false;
   byId('who').hidden = true;
-  byId('options').hidden = true;
+  options.hidden = false;
+  byId('api-controls').append(options);
+  byId('change').hidden = true;
   byId('splash-title').textContent = 'Navidrome Wrapped';
   byId('splash-msg').textContent = '';
   byId('api-intro').textContent = words[0];
@@ -118,6 +141,143 @@ export async function initApiMode(config, locale) {
   if (lang === 'es') {
     byId('splash-title').textContent = 'Navidrome Wrapped';
   }
+
+  async function loadThemes() {
+    const response = await window.NW_I18N.apiFetch('/api/themes');
+    const result = await response.json().catch(() => ({}));
+    if (response.status === 401 && config.auth_enabled) {
+      loginRedirected = true;
+      const next = location.pathname + location.search;
+      location.assign(`/login?next=${encodeURIComponent(next)}`);
+      return;
+    }
+    if (!response.ok) throw new Error(result.detail || locale.ui.offline);
+    const available = (result.themes || []).filter((theme) => !theme.error);
+    themes.clear();
+    themePicker.replaceChildren();
+    for (const theme of available) {
+      themes.set(theme.id, theme);
+      const option = document.createElement('option');
+      option.value = theme.id;
+      option.textContent = theme.name || theme.id;
+      themePicker.append(option);
+    }
+    themeOption.hidden = available.length === 0;
+    if (!available.length) return;
+    const stored = (() => {
+      try { return localStorage.getItem('wrapped.apiTheme'); } catch { return null; }
+    })();
+    const selected = themes.has(stored) ? stored : (themes.has(result.default) ? result.default : available[0].id);
+    themePicker.value = selected;
+    await applyTheme(selected);
+  }
+
+  async function applyTheme(id) {
+    const response = await window.NW_I18N.apiFetch(`/api/themes/${encodeURIComponent(id)}`);
+    const theme = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(theme.detail || locale.ui.offline);
+    for (const key of activeThemeTokens) {
+      const original = initialThemeTokens.get(key);
+      if (original) document.documentElement.style.setProperty(key, original);
+      else document.documentElement.style.removeProperty(key);
+    }
+    activeThemeTokens.clear();
+    for (const [key, value] of Object.entries(theme.tokens || {})) {
+      if (!initialThemeTokens.has(key)) initialThemeTokens.set(key, getComputedStyle(document.documentElement).getPropertyValue(key).trim());
+      document.documentElement.style.setProperty(key, value);
+      activeThemeTokens.add(key);
+    }
+    document.documentElement.dataset.theme = theme.id;
+    document.querySelectorAll('link[data-api-theme-css], style[data-api-theme-fonts]').forEach((node) => node.remove());
+    for (const href of theme.css || []) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      link.dataset.apiThemeCss = theme.id;
+      document.head.append(link);
+    }
+    if (theme.fonts?.length) {
+      const safe = (value) => String(value).replace(/["\\]/g, '');
+      const style = document.createElement('style');
+      style.dataset.apiThemeFonts = theme.id;
+      style.textContent = theme.fonts.map((font) =>
+        `@font-face{font-family:"${safe(font.family)}";src:url("${safe(font.url)}");font-weight:${safe(font.weight)};font-style:${safe(font.style || 'normal')}}`).join('\n');
+      document.head.append(style);
+    }
+    try { localStorage.setItem('wrapped.apiTheme', id); } catch { /* Theme choice is optional. */ }
+  }
+
+  themePicker.addEventListener('change', () => {
+    applyTheme(themePicker.value).catch((error) => message(status, error.message, true));
+  });
+
+  const dialog = byId('importer');
+  const importOpen = byId('import-open');
+  const importForm = byId('imp-form');
+  const importMessage = byId('imp-msg');
+  const importButton = byId('imp-go');
+  const importKey = byId('imp-key');
+  const importNotice = dialog.querySelector('.imp-note');
+  const storage = {
+    get(key) { try { return sessionStorage.getItem(key) || ''; } catch { return ''; } },
+    set(key, value) { try { sessionStorage.setItem(key, value); } catch { /* Key persistence is optional. */ } },
+  };
+  importOpen.hidden = !config.import_enabled || typeof dialog.showModal !== 'function';
+  if (importNotice) {
+    importNotice.textContent = ({
+      en: 'In API mode, imported themes change visual tokens, fonts, and CSS only; their JavaScript and React code is not executed.',
+      de: 'Im API-Modus ändern importierte Themes nur Farben, Schriftarten und CSS; JavaScript- und React-Code wird nicht ausgeführt.',
+      es: 'En modo API, los temas importados solo cambian colores, fuentes y CSS; su código JavaScript y React no se ejecuta.',
+      pt: 'No modo API, os temas importados alteram apenas cores, fontes e CSS; o código JavaScript e React não é executado.',
+      fr: 'En mode API, les thèmes importés ne modifient que les couleurs, les polices et le CSS ; leur code JavaScript et React ne s’exécute pas.',
+      it: 'In modalità API, i temi importati modificano solo colori, caratteri e CSS; il codice JavaScript e React non viene eseguito.',
+      nl: 'In de API-modus wijzigen geïmporteerde thema’s alleen kleuren, lettertypen en CSS; JavaScript- en React-code wordt niet uitgevoerd.',
+      ru: 'В режиме API импортированные темы меняют только цвета, шрифты и CSS; код JavaScript и React не выполняется.',
+      zh: '在 API 模式下，导入的主题只能更改颜色、字体和 CSS，不会执行其 JavaScript 或 React 代码。',
+      ja: 'API モードでは、インポートしたテーマは色、フォント、CSS のみを変更し、JavaScript と React のコードは実行されません。',
+      ko: 'API 모드에서 가져온 테마는 색상, 글꼴, CSS만 변경하며 JavaScript와 React 코드는 실행되지 않습니다.',
+      ar: 'في وضع API، تغيّر السمات المستوردة الألوان والخطوط وCSS فقط، ولا يُنفّذ كود JavaScript أو React.',
+    })[lang] || 'In API mode, imported themes change visual tokens, fonts, and CSS only; their JavaScript and React code is not executed.';
+  }
+  const logout = byId('logout');
+  logout.hidden = !config.auth_enabled;
+  logout.addEventListener('click', async () => {
+    await window.NW_I18N.apiFetch('/api/logout', { method: 'POST' });
+    location.assign(`/login?lang=${encodeURIComponent(lang)}`);
+  });
+  importOpen.addEventListener('click', () => {
+    importKey.value = storage.get('wrapped.key');
+    dialog.showModal();
+  });
+  byId('imp-close').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+  importForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const file = byId('imp-file').files[0];
+    if (!file) return;
+    importButton.disabled = true;
+    importMessage.textContent = locale.html.uploading || words[7];
+    try {
+      const key = importKey.value;
+      const response = await window.NW_I18N.apiFetch(`/api/themes/import?force=${byId('imp-force').checked}`, {
+        method: 'POST', body: file,
+        headers: { 'Content-Type': 'application/zip', 'X-Admin-Key': key },
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.detail || locale.ui.offline);
+      storage.set('wrapped.key', key);
+      await loadThemes();
+      themePicker.value = result.id;
+      await applyTheme(result.id);
+      importMessage.textContent = (locale.html.installed || '').replace('{id}', result.id);
+      importForm.reset();
+    } catch (error) {
+      importMessage.textContent = error instanceof TypeError ? locale.ui.offline : error.message;
+      importMessage.classList.add('err');
+    } finally {
+      importButton.disabled = false;
+    }
+  });
 
   function displaySummary(data) {
     if (!data || data.source !== 'api' || data.limited !== true) {
@@ -181,7 +341,11 @@ export async function initApiMode(config, locale) {
         }),
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : locale.ui.offline);
+      if (!response.ok) {
+        const detail = typeof result.detail === 'string' ? result.detail : locale.ui.offline;
+        throw new Error(detail === 'HTTPS is required to send Navidrome credentials.'
+          ? (httpsError[lang] || httpsError.en) : detail);
+      }
       byId('api-password').value = '';
       byId('api-token').value = '';
       byId('api-salt').value = '';
@@ -209,6 +373,8 @@ export async function initApiMode(config, locale) {
   });
 
   try {
+    await loadThemes();
+    if (loginRedirected) return;
     const response = await window.NW_I18N.apiFetch('/api/source/summary');
     if (response.ok) {
       displaySummary(await response.json());
@@ -216,8 +382,8 @@ export async function initApiMode(config, locale) {
       const result = await response.json().catch(() => ({}));
       message(status, result.detail || locale.ui.offline, true);
     }
-  } catch {
-    message(status, locale.ui.offline, true);
+  } catch (error) {
+    if (!loginRedirected) message(status, error.message || locale.ui.offline, true);
   }
   panel.setAttribute('aria-label', words[8]);
   byId('splash').dataset.ready = '1';

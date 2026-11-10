@@ -108,10 +108,40 @@ body[data-state="gate"] #change { display: none; }
 #api-latest-albums { display: grid; gap: .5rem; padding-left: 1.5rem; }
 #api-latest-albums li { padding-left: .25rem; }
 #api-latest-albums img { width: 2.2rem; height: 2.2rem; margin-right: .55rem; border-radius: .3rem; object-fit: cover; vertical-align: middle; }
-body[data-source="api"] #stage { width: min(100vw, 40rem); max-width: min(100vw, 40rem); }
-body[data-source="api"] #splash { justify-content: flex-start; overflow-y: auto; padding-top: max(4.5rem, calc(env(safe-area-inset-top) + 3.5rem)); }
-body[data-source="api"] #splash h1 { font-size: clamp(1.7rem, 8vw, 2.5rem); }
+body[data-source="api"] #app { display: block; }
+body[data-source="api"] #stage { width: 100vw; max-width: none; }
+body[data-source="api"] #splash {
+  display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+  gap: 1rem; overflow-y: auto; padding: max(4.5rem, calc(env(safe-area-inset-top) + 3.5rem)) 1rem 2rem;
+  text-align: center;
+}
+body[data-source="api"] #splash h1 { max-width: 100%; font-size: clamp(1.8rem, 5vw, 3rem); line-height: 1.05; }
+body[data-source="api"] #splash-msg { display: none; }
+body[data-source="api"] #api-panel { width: min(100%, 34rem); margin: 0 auto; }
+body[data-source="api"] #api-intro, body[data-source="api"] #api-privacy { text-align: center; }
+body[data-source="api"] #api-summary { max-height: none; }
+body[data-source="api"] #api-latest-albums {
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); gap: .75rem; padding: 0; list-style: none;
+}
+body[data-source="api"] #api-latest-albums li {
+  display: flex; flex-direction: column; gap: .5rem; min-width: 0; padding: .65rem;
+  border: 1px solid rgba(255,255,255,.15); border-radius: 12px; background: rgba(255,255,255,.06);
+  overflow-wrap: anywhere;
+}
+body[data-source="api"] #api-latest-albums img { width: 100%; height: auto; aspect-ratio: 1; margin: 0; }
+body[data-source="api"] #api-controls { display: grid; justify-items: center; width: min(100%, 34rem); margin: 1rem auto 0; }
+body[data-source="api"] #options { gap: .75rem; }
+body[data-source="api"] #options .opt-sel { display: flex; flex-wrap: wrap; justify-content: center; }
+body[data-source="api"] #options .opt-sel select { max-width: min(100%, 18rem); }
 body[data-source="api"] #rail-l, body[data-source="api"] #rail-r { display: none !important; }
+html[data-view="wide"] body[data-source="api"] #splash {
+  display: flex; flex-direction: column; grid-template-columns: none; grid-template-rows: none;
+  justify-content: flex-start; align-items: center; justify-items: center; text-align: center;
+  padding: clamp(4.5rem, 8vh, 6rem) 2rem 2rem;
+}
+html[data-view="wide"] body[data-source="api"] #splash h1 { grid-column: auto; grid-row: auto; align-self: auto; }
+html[data-view="wide"] body[data-source="api"] #splash #api-panel { grid-column: auto; grid-row: auto; justify-self: auto; }
+html[data-view="wide"] body[data-source="api"] #splash #options { grid-column: auto; grid-row: auto; justify-content: center; }
 
 /* ── Importar tema ── */
 #importer { position: fixed; inset: 0; margin: auto; height: fit-content; max-height: 90dvh; overflow: auto;
@@ -265,3 +295,19 @@ body.busy #loader { z-index: 10000; }
 /* Zoom con pellizco en táctil: el gesto lo gestiona el reproductor */
 @media (hover: none) { #stage { touch-action: none; } }
 #react-root, .swiper { transform-origin: 0 0; }
+
+html[data-view="wide"] body[data-source="api"][data-state="gate"] #splash {
+  display: flex; flex-direction: column; grid-template-columns: none; grid-template-rows: none;
+  justify-content: flex-start; align-items: center; justify-items: center; align-content: flex-start;
+  gap: 1rem; text-align: center; overflow-y: auto; padding: clamp(4.5rem, 8vh, 6rem) 2rem 2rem;
+}
+html[data-view="wide"] body[data-source="api"][data-state="gate"] #splash h1 {
+  grid-column: auto; grid-row: auto; align-self: auto; font-size: clamp(1.8rem, 5vw, 3rem); max-width: 100%;
+}
+html[data-view="wide"] body[data-source="api"][data-state="gate"] #splash #api-panel,
+html[data-view="wide"] body[data-source="api"][data-state="gate"] #splash #api-controls {
+  grid-column: auto; grid-row: auto; justify-self: auto;
+}
+html[data-view="wide"] body[data-source="api"][data-state="gate"] #splash #api-panel #options {
+  grid-column: auto; grid-row: auto; justify-content: center; flex-wrap: wrap; margin: 0;
+}

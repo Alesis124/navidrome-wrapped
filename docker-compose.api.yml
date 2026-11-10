@@ -11,11 +11,16 @@ services:
       TZ: ${TZ:-Europe/Madrid}
       DATA_SOURCE: ${DATA_SOURCE:-api}
       NAVIDROME_URL: ${NAVIDROME_URL:-}
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1,::1}
       CACHE_DIR: /cache
       WRAPPED_LANGUAGE: ${WRAPPED_LANGUAGE:-en}
+      WRAPPED_THEME: ${WRAPPED_THEME:-}
       THEMES_DIR: /themes
       AUTH_USER: ${AUTH_USER:-}
       AUTH_PASSWORD: ${AUTH_PASSWORD:-}
+      ADMIN_KEY: ${ADMIN_KEY:-}
+    volumes:
+      - ./themes:/themes
     ports:
       - "${WRAPPED_PORT:-8100}:8000"
     read_only: true

@@ -56,6 +56,7 @@ It also sets `./themes` to owner `PUID:PGID` so the web app can install imported
 |---|---|
 | `DATA_SOURCE` | `local` (default SQLite mode) or `api` (Subsonic-compatible Navidrome API mode) |
 | `NAVIDROME_URL` | Optional public HTTPS Navidrome base URL. If blank in API mode, each visitor enters one. It must resolve only to public IP addresses; localhost, private, and link-local targets are blocked |
+| `FORWARDED_ALLOW_IPS` | Trusted reverse-proxy IPs/CIDRs for Uvicorn. Configure this in API mode when HTTPS terminates at a proxy so the app can recognize its forwarded HTTPS scheme. Do not use `*` if the app port is directly reachable |
 | `NAVIDROME_NETWORK` | Local mode only: Navidrome's Docker network: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
 | `NAVIDROME_DATA_DIR` | Local mode only: host directory containing `navidrome.db` (the one Navidrome mounts at `/data`) |
 | `MUSIC_DIR_HOST` | Local mode only: host directory containing the music (the same one Navidrome mounts at `/music`) |
@@ -76,14 +77,24 @@ Visitors can choose their language on the start screen before opening the Wrappe
 The existing `docker-compose.yml` and `./deploy.sh` keep local SQLite mode and its database/music mounts. To run without those mounts, set `DATA_SOURCE=api` (or leave it blank) and start the API-only Compose file:
 
 ```bash
-docker compose -f docker-compose.api.yml up -d --build
+docker compose -f docker-compose.api.yml pull
+docker compose -f docker-compose.api.yml up -d --no-build
+```
+
+If you do not have the Compose file locally, you can pipe it from GitHub for either command; this pulls the published image and does not download the application source:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Alesis124/navidrome-wrapped/main/docker-compose.api.yml | docker compose -f - pull
+curl -fsSL https://raw.githubusercontent.com/Alesis124/navidrome-wrapped/main/docker-compose.api.yml | docker compose -f - up -d --no-build
 ```
 
 Set `NAVIDROME_URL` to a public base URL to use one configured server; if it is blank, visitors enter a public URL on the setup screen. Each visitor connects with a Navidrome username and password, or a Subsonic token and salt. Credentials are sent in the request body to this Wrapped server, kept only in server process memory for the session, and then used for direct Subsonic API requests to Navidrome. The browser receives only an opaque HTTP-only session cookie; credentials are not placed in browser storage, the page URL, or theme JavaScript. API sessions expire after eight hours and are lost when the server restarts. Do not run multiple worker processes or replicas: sessions are intentionally in process memory.
 
+The API Compose file mounts `./themes` and passes `ADMIN_KEY` through, so the theme selector and ZIP importer are available in API mode. Ensure the host `themes` directory is writable by the configured `PUID`/`PGID` to import themes. In this mode, themes can change visual tokens, fonts, and CSS only; JavaScript and React theme code is never served as executable bundle content.
+
 API mode shows current music-folder metadata and a short list of newest albums. It is explicitly not year-specific: the [Subsonic-compatible API](https://www.navidrome.org/docs/developers/subsonic-api/) does not expose per-play history, so this mode does not produce calendar-year charts or other fabricated annual statistics. Covers are proxied through the server and are not written to the application cache. API mode does not mount or write a persistent cache volume.
 
-Visitor-entered and configured server URLs must use HTTPS and resolve exclusively to public IPs. The Wrapped site itself must also be reached over HTTPS to submit credentials; API mode rejects credential submissions over plain HTTP. Localhost, private, link-local, and mixed public/private DNS results are rejected. The backend connects directly to the validated IP, does not use environment proxy settings, and does not follow redirects. This is an internet-facing URL mode, not a way to connect to a private/LAN Navidrome address.
+Visitor-entered and configured server URLs must use HTTPS and resolve exclusively to public IPs. The Wrapped site itself must also be reached over HTTPS to submit credentials; API mode rejects credential submissions over plain HTTP. If HTTPS terminates at a reverse proxy, set `FORWARDED_ALLOW_IPS` to the proxy's IP or network as seen by this container, and configure the proxy to send `X-Forwarded-Proto: https`. Uvicorn trusts forwarded headers only from those configured addresses. Do not use `*` when the app port is directly reachable. Localhost, private, link-local, and mixed public/private DNS results are rejected. The backend connects directly to the validated IP, does not use environment proxy settings, and does not follow redirects. This is an internet-facing URL mode, not a way to connect to a private/LAN Navidrome address.
 
 ### Two important details
 
@@ -97,7 +108,7 @@ The container runs as a non-root user, with a read-only filesystem (except `/cac
 
 The application does not send data to the project maintainers. Requests and cookies still pass through the browser and the server where you deploy it. Local mode retains its existing browser username/preferences and disk cache behavior. API mode keeps the Navidrome credential/token in server process memory only, but the browser still holds an opaque session cookie and transient form/request data in memory; language preferences may remain in browser storage. API responses and covers use `no-store`, and API mode does not write an application cache to disk. Protect the Wrapped site with HTTPS and access controls when exposing it publicly.
 
-Theme importing is disabled unless you define `ADMIN_KEY`, because a theme can run JavaScript in the browser of anyone who opens it. ZIP files are validated (paths, symbolic links, size, and extensions) and cannot replace the included themes.
+Theme importing is disabled unless you define `ADMIN_KEY`. ZIP files are validated (paths, symbolic links, size, and extensions) and cannot replace the included themes. In API mode, imported themes can change visual tokens, fonts, and CSS only; their JavaScript/React story code is not sent to or executed by the browser.
 
 ## API
 
