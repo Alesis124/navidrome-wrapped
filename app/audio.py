@@ -6,14 +6,15 @@ from pathlib import Path
 from fastapi import HTTPException
 
 from . import db, queries
-from .config import CACHE_DIR, CLIP_SECONDS, MUSIC_DIR
+from .config import CACHE_DIR, CLIP_SECONDS, DATA_SOURCE, MUSIC_DIR
 
 ID_RE = re.compile(r"^[A-Za-z0-9_-]{6,64}$")
 CLIPS = Path(CACHE_DIR) / "clips"
 COVERS = Path(CACHE_DIR) / "covers"
 BLURS = Path(CACHE_DIR) / "blur"
-for _d in (CLIPS, COVERS, BLURS):
-    _d.mkdir(parents=True, exist_ok=True)
+if DATA_SOURCE == "local":
+    for _d in (CLIPS, COVERS, BLURS):
+        _d.mkdir(parents=True, exist_ok=True)
 
 _locks: dict[str, asyncio.Lock] = {}
 _sem = asyncio.Semaphore(2)  # no saturar la máquina con ffmpeg en paralelo

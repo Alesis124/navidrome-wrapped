@@ -9,6 +9,7 @@ import { DEFAULT_SEQUENCE, SLIDES } from './slides.js';
 import { mountReactTheme } from './react-host.js';
 import { loadTheme } from './theme.js';
 import { $, initChrome, setState } from './ui.js';
+import { initApiMode } from './api-mode.js';
 
 async function fetchWrapped(q) {
   const wp = new URLSearchParams();
@@ -53,6 +54,16 @@ async function main() {
     url.searchParams.set('lang', language);
     location.assign(url);
   });
+
+  if (config.data_source === 'api') {
+    const apiUrl = new URL(location.href);
+    for (const key of ['user', 'year', 'theme', 'url', 'username', 'password', 'token', 'salt',
+      'navidrome_url', 'u', 'p', 't', 's']) apiUrl.searchParams.delete(key);
+    if (apiUrl.href !== location.href) history.replaceState(history.state, '', apiUrl);
+    try { localStorage.removeItem('wrapped.user'); } catch { /* Storage may be disabled. */ }
+    await initApiMode(config, locale);
+    return;
+  }
 
   let theme;
   try { theme = await loadTheme(q.get('theme'), q.get('year')); }

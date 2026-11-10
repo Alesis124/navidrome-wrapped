@@ -6,20 +6,47 @@ import json
 import re
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 import mimetypes
 
 from . import audio, auth, db, queries, stats, themes
 from .version import __version__
-from .config import ADMIN_KEY, DEFAULT_USER, DEFAULT_YEAR, MAX_THEME_ZIP, WRAPPED_LANGUAGE
+from .config import (ADMIN_KEY, DATA_SOURCE, DEFAULT_USER, DEFAULT_YEAR, MAX_THEME_ZIP,
+                     NAVIDROME_URL, WRAPPED_LANGUAGE)
 from .i18n import tr
+from . import navidrome_api
 
 app = FastAPI(title="Navidrome Wrapped", version=__version__)
 mimetypes.add_type("font/woff2", ".woff2")
 mimetypes.add_type("text/javascript", ".js")
 CACHE = {"Cache-Control": "public, max-age=86400"}
+API_SESSION_COOKIE = "wrapped_api_session"
+
+
+def require_local_source():
+    if DATA_SOURCE != "local":
+        raise HTTPException(409, "This endpoint is available only in local SQLite mode.")
+
+
+def require_api_source():
+    if DATA_SOURCE != "api":
+        raise HTTPException(409, "This endpoint is available only in Navidrome API mode.")
+
+
+def check_same_origin(request: Request):
+    origin = request.headers.get("origin", "")
+    host = request.headers.get("host", "")
+    from urllib.parse import urlsplit
+    try:
+        parsed = urlsplit(origin)
+    except ValueError:
+        parsed = None
+    if (not parsed or parsed.scheme not in {"http", "https"} or parsed.path or parsed.query or
+            parsed.fragment or parsed.username is not None or parsed.password is not None or
+            parsed.netloc.lower() != host.lower()):
+        raise HTTPException(403, "Same-origin request required.")
 
 
 @app.get("/login")
@@ -60,12 +87,15 @@ def logout():
 
 @app.get("/api/health")
 def health():
+    if DATA_SOURCE == "api":
+        return {"ok": True, "version": __version__, "mode": "api", "db_access": None}
     with db.connect() as conn:
         return {"ok": True, "version": __version__, "mode": db.detect_mode(conn), "db_access": db.source()}
 
 
 @app.get("/api/users")
 def users():
+    require_local_source()
     with db.connect() as conn:
         return [r["user_name"] for r in conn.execute(queries.USERS)]
 
@@ -83,12 +113,92 @@ def resolve_user(conn, name: str) -> str | None:
 @app.get("/api/config")
 def config():
     return {"default_year": DEFAULT_YEAR, "import_enabled": bool(ADMIN_KEY), "auth_enabled": auth.ENABLED,
-            "language": WRAPPED_LANGUAGE, "version": __version__}
+            "language": WRAPPED_LANGUAGE, "version": __version__, "data_source": DATA_SOURCE,
+            "api_url_configured": bool(NAVIDROME_URL)}
+
+
+@app.post("/api/source/session")
+async def api_source_session(request: Request):
+    require_api_source()
+    check_same_origin(request)
+    if not auth.secure(request):
+        raise HTTPException(400, "HTTPS is required to send Navidrome credentials.")
+    try:
+        content_length = int(request.headers.get("content-length") or 0)
+    except ValueError:
+        raise HTTPException(400, "Invalid Content-Length.") from None
+    if content_length > 8192:
+        raise HTTPException(413, "Request is too large.")
+    raw = bytearray()
+    async for chunk in request.stream():
+        raw.extend(chunk)
+        if len(raw) > 8192:
+            raise HTTPException(413, "Request is too large.")
+    try:
+        body = json.loads(raw)
+    except (ValueError, TypeError):
+        raise HTTPException(400, "Invalid request body.") from None
+    if not isinstance(body, dict):
+        raise HTTPException(400, "Invalid request body.")
+    for key in ("url", "username", "password", "token", "salt"):
+        if not isinstance(body.get(key, ""), str):
+            raise HTTPException(400, "Invalid request body.")
+    try:
+        session_id, summary = await asyncio.to_thread(
+            navidrome_api.create_session,
+            body.get("url", ""), body.get("username", ""), body.get("password", ""),
+            body.get("token", ""), body.get("salt", ""))
+    except navidrome_api.NavidromeError as exc:
+        raise HTTPException(exc.status_code, str(exc)) from None
+    response = JSONResponse({"ok": True, "summary": summary},
+                            headers={"Cache-Control": "no-store"})
+    response.set_cookie(API_SESSION_COOKIE, session_id, httponly=True, samesite="strict",
+                        secure=auth.secure(request), path="/")
+    return response
+
+
+@app.get("/api/source/summary")
+async def api_source_summary(request: Request):
+    require_api_source()
+    session = navidrome_api.get_session(request.cookies.get(API_SESSION_COOKIE))
+    if not session:
+        raise HTTPException(401, "Navidrome session expired. Connect again.")
+    try:
+        result = await asyncio.to_thread(navidrome_api.fetch_summary, session)
+    except navidrome_api.NavidromeError as exc:
+        raise HTTPException(exc.status_code, str(exc)) from None
+    return JSONResponse(result, headers={"Cache-Control": "no-store"})
+
+
+@app.post("/api/source/logout")
+async def api_source_logout(request: Request):
+    require_api_source()
+    check_same_origin(request)
+    navidrome_api.delete_session(request.cookies.get(API_SESSION_COOKIE))
+    response = JSONResponse({"ok": True}, headers={"Cache-Control": "no-store"})
+    response.delete_cookie(API_SESSION_COOKIE, path="/", httponly=True, samesite="strict",
+                           secure=auth.secure(request))
+    return response
+
+
+@app.get("/api/source/covers/{cover_id}")
+async def api_source_cover(cover_id: str, request: Request):
+    require_api_source()
+    session = navidrome_api.get_session(request.cookies.get(API_SESSION_COOKIE))
+    if not session:
+        raise HTTPException(401, "Navidrome session expired. Connect again.")
+    try:
+        content, content_type = await asyncio.to_thread(navidrome_api.fetch_cover, session, cover_id)
+    except navidrome_api.NavidromeError as exc:
+        raise HTTPException(exc.status_code, str(exc)) from None
+    return Response(content, media_type=content_type,
+                    headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
 
 
 @app.get("/api/years")
 def years(user: str = Query(...)):
     """Años con reproducciones de un usuario (para el selector de la pantalla de inicio)."""
+    require_local_source()
     with db.connect() as conn:
         name = resolve_user(conn, user)
         if not name:
@@ -100,6 +210,7 @@ def years(user: str = Query(...)):
 
 @app.get("/api/wrapped")
 def wrapped(background: BackgroundTasks, user: str = Query(DEFAULT_USER), year: int = Query(DEFAULT_YEAR)):
+    require_local_source()
     if not user:
         raise HTTPException(400, tr("user_required"))
     with db.connect() as conn:
@@ -125,12 +236,14 @@ def wrapped(background: BackgroundTasks, user: str = Query(DEFAULT_USER), year: 
 
 @app.get("/api/cover/{track_id}/blur")
 async def cover_blur(track_id: str):
+    require_local_source()
     return FileResponse(await audio.get_cover_blur(track_id),
                         media_type="image/jpeg", headers=CACHE)
 
 
 @app.get("/api/themes")
 def themes_list():
+    require_local_source()
     return {"default": themes.default_id(DEFAULT_YEAR), "themes": themes.list_themes()}
 
 
@@ -141,6 +254,7 @@ async def theme_import(request: Request, force: bool = Query(False), id: str | N
     Un tema puede ejecutar JavaScript en el navegador de quien lo abra, así que solo se
     acepta con la clave ADMIN_KEY (cabecera X-Admin-Key); sin clave configurada está desactivado.
     """
+    require_local_source()
     if not ADMIN_KEY:
         raise HTTPException(403, tr("import_disabled"))
     if not hmac.compare_digest(request.headers.get("x-admin-key", "").encode(), ADMIN_KEY.encode()):
@@ -164,6 +278,7 @@ async def theme_import(request: Request, force: bool = Query(False), id: str | N
 @app.get("/api/themes/{theme_id}")
 def theme_bundle(theme_id: str, year: int = Query(DEFAULT_YEAR)):
     """theme_id = «default» resuelve ?theme > WRAPPED_THEME > tema del año > frecuencia."""
+    require_local_source()
     try:
         return themes.load(themes.default_id(year) if theme_id == "default" else theme_id)
     except themes.ThemeNotFound as e:
@@ -174,6 +289,7 @@ def theme_bundle(theme_id: str, year: int = Query(DEFAULT_YEAR)):
 
 @app.get("/themes/{theme_id}/{path:path}")
 def theme_file(theme_id: str, path: str):
+    require_local_source()
     try:
         f = themes.resolve_file(theme_id, path)
     except themes.ThemeError:
@@ -183,12 +299,14 @@ def theme_file(theme_id: str, path: str):
 
 @app.get("/api/clip/{track_id}")
 async def clip(track_id: str, seconds: int | None = Query(None, ge=5, le=60)):
+    require_local_source()
     return FileResponse(await audio.get_clip(track_id, seconds),
                         media_type="audio/mpeg", headers=CACHE)
 
 
 @app.get("/api/cover/{track_id}")
 async def cover(track_id: str):
+    require_local_source()
     return FileResponse(await audio.get_cover(track_id),
                         media_type="image/jpeg", headers=CACHE)
 
@@ -201,6 +319,10 @@ async def no_stale_static(request, call_next):
     """El código del front (js/css/html) siempre se revalida: así un despliegue nuevo se ve sin vaciar caché."""
     resp = await call_next(request)
     p = request.url.path
+    if DATA_SOURCE == "api":
+        resp.headers["Cache-Control"] = "no-store"
+        resp.headers["Pragma"] = "no-cache"
+        return resp
     if not p.startswith("/api/") and p.endswith((".js", ".css", ".html", "/")):
         resp.headers["Cache-Control"] = "no-cache"
     return resp

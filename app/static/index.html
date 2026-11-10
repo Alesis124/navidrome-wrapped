@@ -69,6 +69,34 @@
         </label>
         <h1 id="splash-title"></h1>
         <p id="splash-msg" role="status"></p>
+        <section id="api-panel" hidden>
+          <p id="api-intro" class="api-intro"></p>
+          <p id="api-privacy" class="api-privacy"></p>
+          <form id="api-form" autocomplete="off">
+            <label class="field api-url-field"><span id="api-url-label"></span>
+              <input id="api-url" name="url" type="url" inputmode="url" autocomplete="off" spellcheck="false"
+                placeholder="https://music.example.com" maxlength="2048"></label>
+            <label class="field"><span id="api-username-label"></span>
+              <input id="api-username" name="username" type="text" autocomplete="off" autocapitalize="off"
+                spellcheck="false" maxlength="128" required></label>
+            <label class="field"><span id="api-password-label"></span>
+              <input id="api-password" name="password" type="password" autocomplete="off" maxlength="1024"></label>
+            <p class="api-or"></p>
+            <label class="field"><span id="api-token-label"></span>
+              <input id="api-token" name="token" type="password" autocomplete="off" maxlength="256"></label>
+            <label class="field"><span id="api-salt-label"></span>
+              <input id="api-salt" name="salt" type="password" autocomplete="off" maxlength="128"></label>
+            <button id="api-connect" type="submit"></button>
+          </form>
+          <p id="api-message" role="status" aria-live="polite"></p>
+          <section id="api-summary" hidden aria-labelledby="api-summary-title">
+            <h2 id="api-summary-title"></h2>
+            <p id="api-scope"></p>
+            <p id="api-library"></p>
+            <ol id="api-latest-albums"></ol>
+            <button id="api-disconnect" type="button" class="opt-btn"></button>
+          </section>
+        </section>
         <!-- Dos modos: «gate» (escribir usuario y elegir año) y «ready» (empezar) -->
         <form id="who" data-mode="ready" autocomplete="off" novalidate>
           <div class="fields">

@@ -1,0 +1,27 @@
+name: navidrome-wrapped-api
+
+services:
+  wrapped:
+    image: ${WRAPPED_IMAGE:-ghcr.io/alesis124/navidrome-wrapped:latest}
+    build: .
+    container_name: navidrome-wrapped
+    restart: unless-stopped
+    user: "${PUID:-1000}:${PGID:-1000}"
+    environment:
+      TZ: ${TZ:-Europe/Madrid}
+      DATA_SOURCE: ${DATA_SOURCE:-api}
+      NAVIDROME_URL: ${NAVIDROME_URL:-}
+      CACHE_DIR: /cache
+      WRAPPED_LANGUAGE: ${WRAPPED_LANGUAGE:-en}
+      THEMES_DIR: /themes
+      AUTH_USER: ${AUTH_USER:-}
+      AUTH_PASSWORD: ${AUTH_PASSWORD:-}
+    ports:
+      - "${WRAPPED_PORT:-8100}:8000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

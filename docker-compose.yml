@@ -11,6 +11,8 @@ services:
     user: "${PUID:-1000}:${PGID:-1000}"
     environment:
       TZ: ${TZ:-Europe/Madrid}
+      DATA_SOURCE: ${DATA_SOURCE:-local}  # local | api (API deployments: docker-compose.api.yml)
+      NAVIDROME_URL: ${NAVIDROME_URL:-}
       DB_PATH: /data/navidrome.db
       MUSIC_DIR: /music
       CACHE_DIR: /cache

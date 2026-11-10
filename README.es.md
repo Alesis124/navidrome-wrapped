@@ -4,15 +4,15 @@
 
 # Navidrome Wrapped
 
-Resumen anual estilo "Wrapped" para tu Navidrome: top artistas y canciones, minutos escuchados,
-descubrimientos, datos curiosos (madrugadas, modo bucle, hora favorita…) y un reproductor de
-historias con música de fondo (clips de 30 s de tus canciones top) y exportación de cada tarjeta a PNG.
+En modo SQLite local, un resumen anual estilo "Wrapped" para Navidrome: artistas y canciones favoritas,
+minutos escuchados, descubrimientos, datos curiosos y un reproductor de historias con exportación PNG.
+El modo API ofrece en su lugar un resumen limitado de la biblioteca actual.
 
-- **Backend:** FastAPI + SQLite (solo lectura) + ffmpeg para los clips.
+- **Backend:** FastAPI con SQLite local de solo lectura (modo existente) o un modo API limitado de Navidrome compatible con Subsonic.
 - **Frontend:** HTML/CSS/JS + Swiper, sin build y sin CDN (todo va en `app/static/vendor`).
 - **Temas:** el aspecto (barra de progreso, transiciones, fondo, tipografía, textos, orden de diapositivas) es
   un tema intercambiable que se importa como carpeta o zip. Ver [THEMES.md](THEMES.md).
-- **Bajo demanda:** no hay procesos en segundo plano; calcula al abrir la página.
+- **Bajo demanda:** no hay procesos en segundo plano; las estadísticas locales se calculan al abrir la página.
 - **Accesibilidad:** pausa con teclado, foco visible y avisos de diapositiva para lectores de pantalla. No se ha realizado una auditoría formal ni se garantiza la conformidad con WCAG.
 
 ## Vista previa
@@ -56,9 +56,10 @@ y además deja `./themes` con el dueño `PUID:PGID` para que la web pueda instal
   (en la vista ancha sale apaisada). La vista es automática: en un ordenador sale la ancha y en un
   móvil (o una ventana estrecha) el marco 9:16. También se salta a una diapositiva pulsando su tramo de la barra de progreso. Classic y Neón también
   tienen vista ancha; un tema sin maquetación apaisada usa siempre el marco 9:16.
-- **Al abrir la página** cada persona escribe su usuario de Navidrome (no distingue mayúsculas; la
+- **Modo local:** al abrir la página cada persona escribe su usuario de Navidrome (no distingue mayúsculas; la
   página recuerda el último) y elige entre los años en que tiene reproducciones. No se lista a los demás
-  usuarios. Un enlace directo sigue valiendo: `/?user=Alesis&year=2026`.
+  usuarios. Un enlace directo sigue valiendo: `/?user=Alesis&year=2026`. **Modo API:** cada visitante introduce
+  sus credenciales de Navidrome; no hay selector ni resumen anual.
 - **Importar temas:** botón «Importar tema (.zip)» en la pantalla de inicio. Pide la clave `ADMIN_KEY`;
   `./deploy.sh` la crea sola en `.env` la primera vez y la muestra por pantalla.
 
@@ -66,11 +67,13 @@ y además deja `./themes` con el dueño `PUID:PGID` para que la web pueda instal
 
 | Variable | Qué poner |
 |---|---|
-| `NAVIDROME_NETWORK` | Red Docker de Navidrome: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
-| `NAVIDROME_DATA_DIR` | Carpeta del host con `navidrome.db` (la que Navidrome monta en `/data`) |
-| `MUSIC_DIR_HOST` | Carpeta del host con la música (la misma que Navidrome monta en `/music`) |
+| `DATA_SOURCE` | `local` (modo SQLite predeterminado) o `api` (API compatible con Subsonic de Navidrome) |
+| `NAVIDROME_URL` | URL base HTTPS pública opcional. Si queda vacía en modo API, cada visitante escribe una. Debe resolver solo a IP públicas; se bloquean localhost, redes privadas y direcciones de enlace local |
+| `NAVIDROME_NETWORK` | Solo modo local: red Docker de Navidrome: `docker inspect navidrome --format '{{json .NetworkSettings.Networks}}'` |
+| `NAVIDROME_DATA_DIR` | Solo modo local: carpeta del host con `navidrome.db` (la que Navidrome monta en `/data`) |
+| `MUSIC_DIR_HOST` | Solo modo local: carpeta del host con la música (la misma que Navidrome monta en `/music`) |
 | `WRAPPED_LANGUAGE` | Idioma: `en` (inglés, predeterminado), `de` (alemán), `es` (español), `pt` (portugués), `fr` (francés), `it` (italiano), `nl` (neerlandés), `ru` (ruso), `zh` (chino), `ja` (japonés), `ko` (coreano) o `ar` (árabe) |
-| `NAVIDROME_USER` | Opcional: usuario por defecto solo para la API; la página lo pide al entrar |
+| `NAVIDROME_USER` | Solo modo local: usuario predeterminado opcional para las solicitudes JSON |
 | `ADMIN_KEY` | Clave para importar temas `.zip` desde la web. Si está vacía, `./deploy.sh` genera una; vacía a mano = importar desactivado |
 | `PUID` / `PGID` | Usuario que puede leer esas carpetas (`ls -ln /opt/navidrome/data`) |
 
@@ -81,6 +84,20 @@ el volumen como `external: true` al final del fichero.
 Pon el código de idioma que quieras en `WRAPPED_LANGUAGE` dentro de `.env` y ejecuta `./deploy.sh`.
 La interfaz, el login, los temas incluidos, las fechas y los números usarán ese idioma. Los temas personalizados mantienen sus textos originales salvo que incluyan traducciones para el idioma elegido.
 Cada visitante puede elegir el idioma en la pantalla inicial, antes de abrir el Wrapped; la elección se recuerda en ese navegador y no cambia el idioma predeterminado del servidor.
+
+### Despliegue solo con API (sin montar SQLite ni la música)
+
+El `docker-compose.yml` y `./deploy.sh` existentes conservan el modo SQLite local y sus montajes de base de datos y música. Para ejecutar la aplicación sin esos montajes, configura `DATA_SOURCE=api` (o déjalo vacío) y usa este Compose:
+
+```bash
+docker compose -f docker-compose.api.yml up -d --build
+```
+
+Define `NAVIDROME_URL` para usar un servidor público fijo; si está vacía, cada visitante escribe una URL pública en la pantalla de configuración. Cada persona se conecta con su usuario y contraseña de Navidrome o con un token y salt de Subsonic. Las credenciales se envían en el cuerpo de la solicitud a este servidor Wrapped, se mantienen solo en la memoria del proceso durante la sesión y se usan para llamar directamente a la API Subsonic de Navidrome. El navegador recibe únicamente una cookie de sesión opaca y `HttpOnly`: las credenciales no aparecen en el almacenamiento del navegador, en la URL de la página ni en el JavaScript de los temas. Las sesiones caducan tras ocho horas y se pierden al reiniciar el servidor. No ejecutes varios procesos worker o réplicas: las sesiones solo existen en la memoria del proceso.
+
+El modo API solo muestra metadatos actuales de las carpetas de música y una lista breve de álbumes recientes. No son datos de un año concreto: la [API compatible con Subsonic](https://www.navidrome.org/docs/developers/subsonic-api/) no ofrece historial por reproducción, por lo que este modo no crea gráficas anuales ni estadísticas inventadas. Las carátulas pasan por el servidor y no se guardan en la caché de la aplicación. El modo API no monta ni escribe una caché persistente.
+
+Las URLs configuradas o introducidas deben usar HTTPS y resolver exclusivamente a IP públicas. La propia web Wrapped también debe abrirse con HTTPS para enviar las credenciales; el modo API rechaza los envíos por HTTP sin cifrar. Se rechazan localhost, IP privadas, direcciones de enlace local y resultados DNS que mezclen IP públicas y privadas. El backend se conecta directamente a la IP validada, no usa proxies definidos por el entorno y no sigue redirecciones. Este modo está pensado para URLs públicas de Internet; no permite conectar a Navidrome en una dirección privada o de la red local.
 
 ### Dos detalles importantes
 
@@ -99,9 +116,11 @@ Puedes forzarlo con `DB_ACCESS=direct` o `DB_ACCESS=snapshot`.
 ### Seguridad
 
 El contenedor corre sin root, con el sistema de ficheros en solo lectura (excepto `/cache` y `/tmp`),
-sin capabilities y con `no-new-privileges`. No hay autenticación propia: cualquiera que alcance el
-puerto puede pedir el Wrapped de cualquier usuario. Si lo expones fuera de casa, ponlo detrás de tu
-proxy inverso con login o quita el `ports:` y accede solo por la red de Navidrome.
+sin capabilities y con `no-new-privileges`. En modo local, cualquiera que alcance el puerto puede pedir el
+Wrapped de cualquier usuario, salvo que actives `AUTH_USER`/`AUTH_PASSWORD` o un proxy inverso con login.
+En modo API, cada visitante debe introducir sus propias credenciales de Navidrome.
+
+La aplicación no envía datos a quienes mantienen el proyecto. Las solicitudes y cookies sí pasan por el navegador y por el servidor donde despliegas la aplicación. El modo local conserva el comportamiento existente de preferencias/nombre de usuario en el navegador y caché en disco. En modo API, las credenciales o el token de Navidrome se guardan solo en la memoria del proceso, pero el navegador conserva una cookie opaca de sesión y mantiene temporalmente los datos del formulario/solicitud en memoria; las preferencias de idioma pueden permanecer en el almacenamiento del navegador. Las respuestas API y carátulas usan `no-store`, y el modo API no escribe una caché de la aplicación en disco. Usa HTTPS y controles de acceso si expones el Wrapped a Internet.
 
 La importación de temas está desactivada salvo que definas `ADMIN_KEY`, porque un tema puede ejecutar
 JavaScript en el navegador de quien lo abra. Los zips se validan (rutas, enlaces simbólicos, tamaño,
@@ -111,7 +130,9 @@ extensiones) y no pueden sustituir a los temas incluidos.
 
 | Ruta | Descripción |
 |---|---|
-| `GET /api/health` | Estado, modo (`scrobbles` / `annotation`) y tipo de acceso a la BD |
+| `GET /api/health` | Estado, modo de origen de datos y tipo de acceso a la base local cuando corresponda |
+| `POST /api/source/session` · `GET /api/source/summary` · `POST /api/source/logout` | Sesión de visitante y resumen limitado de biblioteca en modo API |
+| `GET /api/source/covers/{cover_id}` | Proxy de carátulas en modo API (requiere cookie de sesión; sin caché) |
 | `GET /api/users` | Usuarios de Navidrome |
 | `GET /api/years?user=` | Años con reproducciones de un usuario (y su nombre exacto) |
 | `GET /api/config` | Año por defecto y si la importación de temas está activa |
@@ -155,6 +176,7 @@ NAVIDROME_USER=demo WRAPPED_YEAR=2026 uvicorn app.main:app --reload
 app/
   main.py      rutas FastAPI
   config.py    variables de entorno
+  navidrome_api.py  sesiones Subsonic seguras y solo en memoria
   db.py        conexión a la BD (directa o snapshot)
   queries.py   SQL
   stats.py     métricas y datos curiosos
@@ -164,7 +186,7 @@ app/
   static/      index.html, css/base.css, js/ (motor), vendor/ (Swiper, html2canvas)
 themes/        tus temas (montado en /themes)
 scripts/       make_demo.py (datos de prueba) · theme.py (new/validate/pack/install)
-Dockerfile · docker-compose.yml · .env.example · THEMES.md
+Dockerfile · docker-compose.yml · docker-compose.api.yml · .env.example · THEMES.md
 ```
 
 ## Problemas habituales
