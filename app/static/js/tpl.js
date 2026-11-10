@@ -8,12 +8,16 @@
 //
 // Dentro de #each se pueden seguir usando los datos de fuera ({{year}}, {{s.x}}…).
 
-const LOCALES = { en: 'en-US', de: 'de-DE', es: 'es-ES', ru: 'ru-RU' };
+const LOCALES = {
+  en: 'en-US', de: 'de-DE', es: 'es-ES', pt: 'pt-PT', fr: 'fr-FR',
+  it: 'it-IT', nl: 'nl-NL', ru: 'ru-RU', zh: 'zh-CN', ja: 'ja-JP',
+  ko: 'ko-KR', ar: 'ar-SA',
+};
 let locale = 'es-ES';
 let nf = new Intl.NumberFormat(locale);
 
 export function setLocale(language) {
-  locale = LOCALES[language] || LOCALES.es;
+  locale = LOCALES[language] || LOCALES.en;
   nf = new Intl.NumberFormat(locale);
 }
 export const getLocale = () => locale;

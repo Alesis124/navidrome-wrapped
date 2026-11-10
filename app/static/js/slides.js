@@ -34,7 +34,7 @@ export const SLIDES = {
       return mk(top(d), {
         minutes: fmt(m), plays: fmt(d.totals.plays),
         artists: fmt(d.totals.artists), tracks: fmt(d.totals.tracks),
-        hours: fmt(m / 60), days: nf1.format(m / 1440), albums: fmt(m / 45),
+        hours: fmt(m / 60), days: fmt1(m / 1440), albums: fmt(m / 45),
         per_day: act ? fmt(m / act) : '', days_active: fmt(act),
         covers: (d.top_tracks || []).slice(0, 5).map((t) => ({ cover: t.cover })),
       });
@@ -169,7 +169,7 @@ export const SLIDES = {
       if (!a?.decades?.length) return null;
       const max = Math.max(...a.decades.map((e) => e.pct), 1);
       return mk(a.oldest?.cover ? a.oldest : top(d), {
-        age: a.estimate, median_year: a.median_year, decade: a.decade, decade_share: nf1.format(a.decade_share),
+        age: a.estimate, median_year: a.median_year, decade: a.decade, decade_share: fmt1(a.decade_share),
         coverage: a.coverage, oldest_title: a.oldest?.title, oldest_artist: a.oldest?.artist, oldest_year: a.oldest?.year,
         newest_title: a.newest?.title, newest_artist: a.newest?.artist, newest_year: a.newest?.year,
         decades: a.decades.map((e) => ({ label: `${e.decade}s`, pct: pct(e.pct, max), share: fmt1(e.pct), peak: e.decade === a.decade })),
