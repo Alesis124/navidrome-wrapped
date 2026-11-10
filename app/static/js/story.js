@@ -77,10 +77,10 @@ async function main() {
   }
   if (!data) { chrome.gate({ user: q.get('user') || '', message: err?.message || '' }); return; }
 
-  play(data, theme, chrome, q, locale);
+  play(data, theme, chrome, q, locale, config.language);
 }
 
-function play(data, theme, chrome, q, locale) {
+function play(data, theme, chrome, q, locale, language) {
   const isReact = theme.engine === 'react';   // «html»: plantillas + Swiper · «react»: componente propio (react-host.js)
   // ---------- Diapositivas ----------
   const compiled = {};
@@ -220,13 +220,11 @@ function play(data, theme, chrome, q, locale) {
     bgm = new Bgm();
     bgm.setVolume(vol);
     await bgm.start();
-    $('#splash').remove();
-    $('#slides').removeAttribute('aria-hidden');
     setState('playing');
     if (isReact) {
       try {
         swiper = await mountReactTheme({ theme, data, slides, vars: { year: data.year, user: data.user, next_year },
-          language: config.language || 'en',
+          language: language || 'en',
           stage: $('#stage'), onError: (err) => console.error(`[tema ${theme.id}]`, err),
           play: (src) => { if (audioOn) bgm.play(src, theme.audio.fade ?? 0.8); } });
       } catch (err) {
@@ -242,6 +240,8 @@ function play(data, theme, chrome, q, locale) {
       try { hooks.init?.({ root: $('#stage'), data, theme, swiper, bgm, slides }); }
       catch (err) { console.warn(`[tema ${theme.id}] error en el script del tema`, err); }
     }
+    $('#splash').remove();
+    $('#slides').removeAttribute('aria-hidden');
     $('#pause').hidden = false;
     updatePauseControl();
     if (manualPaused) pauseOn();
