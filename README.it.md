@@ -41,7 +41,7 @@ In `.env`, imposta i percorsi e le opzioni necessari:
 | `ADMIN_KEY` | Chiave per importare temi ZIP |
 | `PUID` / `PGID` | ID utente/gruppo con accesso in lettura |
 
-La musica deve essere montata nel container nello stesso percorso usato da Navidrome (di solito `/music`). Dopo aver modificato `WRAPPED_LANGUAGE`, esegui di nuovo `./deploy.sh`. Ogni visitatore può anche cambiare lingua dal selettore in alto a destra: la scelta viene salvata nel browser e non modifica la lingua iniziale del server. I temi personalizzati devono includere le proprie traduzioni.
+La musica deve essere montata nel container nello stesso percorso usato da Navidrome (di solito `/music`). Dopo aver modificato `WRAPPED_LANGUAGE`, esegui di nuovo `./deploy.sh`. Ogni visitatore può scegliere la lingua nella schermata iniziale prima di aprire Wrapped: la scelta viene salvata nel browser e non modifica la lingua iniziale del server. I temi personalizzati devono includere le proprie traduzioni.
 
 ## Uso e sicurezza
 

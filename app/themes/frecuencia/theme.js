@@ -346,7 +346,7 @@ function refit(root = $('#slides')) {
 // Por eso se recalcula en todos esos casos y, además, cada vez que se entra en una diapositiva.
 let refitTimer = 0;
 const refitSoon = () => { clearTimeout(refitTimer); refitTimer = setTimeout(() => { refit(); refitTimer = setTimeout(refit, 500); }, 120); };
-addEventListener('wrapped:view', () => { requestAnimationFrame(() => requestAnimationFrame(refit)); refitSoon(); });
+addEventListener('wrapped:view', () => { requestAnimationFrame(() => requestAnimationFrame(() => refit())); refitSoon(); });
 addEventListener('resize', refitSoon);
 addEventListener('orientationchange', refitSoon);
 document.fonts?.addEventListener?.('loadingdone', refitSoon);

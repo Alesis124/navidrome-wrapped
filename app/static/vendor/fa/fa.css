@@ -4,6 +4,8 @@
   src: url("fa-solid-900.woff2") format("woff2"); }
 .fa { display: inline-block; font: 900 1em/1 "FA Solid"; font-style: normal; text-rendering: auto;
   -webkit-font-smoothing: antialiased; }
+.fa-play::before { content: "\f04b"; }
+.fa-pause::before { content: "\f04c"; }
 .fa-expand::before { content: "\f065"; }
 .fa-compress::before { content: "\f066"; }
 .fa-mobile-screen::before { content: "\f3cf"; }

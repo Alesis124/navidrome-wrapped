@@ -45,10 +45,6 @@ html, body { height: 100%; background: #000; color: var(--fg); overflow: hidden;
   top: calc(max(env(safe-area-inset-top), 10px) + 14px); }
 .hud button { width: 38px; height: 38px; border: 0; border-radius: 50%; font-size: 1rem; display: grid; place-items: center; padding: 0;
   color: #fff; background: rgba(0,0,0,.35); backdrop-filter: blur(6px); cursor: pointer; }
-.hud .language-select { width: 50px; height: 38px; padding: 0 3px; border: 1px solid rgba(255,255,255,.35); border-radius: 20px;
-  color: #fff; background: rgba(0,0,0,.55); font: 700 .72rem var(--font); text-align: center; cursor: pointer; }
-.hud .language-select option { color: #111; background: #fff; }
-.hud .language-select:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .hud button[hidden] { display: none; }
 .hud button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 #stage:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
@@ -59,6 +55,11 @@ html, body { height: 100%; background: #000; color: var(--fg); overflow: hidden;
   align-items: center; justify-content: center; gap: 1.5rem; text-align: center; padding: 2rem;
   background: radial-gradient(120% 80% at 50% 0%, var(--c), var(--bg) 70%); }
 #splash:not([data-ready]) > * { visibility: hidden; }
+#splash > .language-picker { position: absolute; z-index: 2; top: max(env(safe-area-inset-top), 12px); right: 12px; visibility: visible; }
+.language-select { width: auto; max-width: 150px; height: 38px; padding: 0 12px; border: 1px solid rgba(255,255,255,.35); border-radius: 20px;
+  color: #fff; background: rgba(0,0,0,.55); font: 700 .8rem var(--font); cursor: pointer; }
+.language-select option { color: #111; background: #fff; }
+.language-select:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 #splash h1 { font-size: clamp(2.4rem, 11vw, 4rem); line-height: 1.05; font-weight: 900; }
 #go { padding: .9rem 2rem; border: 0; border-radius: 999px; font-size: 1.1rem; font-weight: 700;
   background: var(--accent); color: #fff; cursor: pointer; font-family: inherit; }

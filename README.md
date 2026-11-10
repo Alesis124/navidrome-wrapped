@@ -67,7 +67,7 @@ If Navidrome stores its data in a **named volume** instead of a directory, chang
 
 Set `WRAPPED_LANGUAGE` in `.env` to the desired language code, then run `./deploy.sh` to apply it.
 The interface, login screen, built-in themes, dates, and numbers use the selected language. Custom themes use their default text unless they include a translation for that language.
-Visitors can also change the language from the selector in the upper-right corner; their choice is remembered in that browser and does not change the server default.
+Visitors can choose their language on the start screen before opening the Wrapped; their choice is remembered in that browser and does not change the server default.
 
 ### Two important details
 

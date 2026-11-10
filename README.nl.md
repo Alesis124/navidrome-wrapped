@@ -41,7 +41,7 @@ Stel de benodigde paden en opties in `.env` in:
 | `ADMIN_KEY` | Sleutel voor het importeren van ZIP-thema’s |
 | `PUID` / `PGID` | Gebruikers-/groeps-ID met leestoegang |
 
-Koppel de muziek in de container aan hetzelfde pad als in Navidrome (meestal `/music`). Voer `./deploy.sh` opnieuw uit nadat je `WRAPPED_LANGUAGE` hebt gewijzigd. Bezoekers kunnen de taal ook wijzigen met de keuzelijst rechtsboven; de keuze wordt in hun browser opgeslagen en verandert de standaardtaal van de server niet. Aangepaste thema’s moeten hun eigen vertalingen bevatten.
+Koppel de muziek in de container aan hetzelfde pad als in Navidrome (meestal `/music`). Voer `./deploy.sh` opnieuw uit nadat je `WRAPPED_LANGUAGE` hebt gewijzigd. Bezoekers kunnen hun taal kiezen op het startscherm voordat ze Wrapped openen; de keuze wordt in hun browser opgeslagen en verandert de standaardtaal van de server niet. Aangepaste thema’s moeten hun eigen vertalingen bevatten.
 
 ## Gebruik en beveiliging
 
